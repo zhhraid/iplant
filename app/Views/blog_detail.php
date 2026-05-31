@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Blog - iplant.id</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="/"><img src="/images/logo.png" alt="iplant.id Logo" onerror="this.src='https://placehold.co/150x50?text=iplant.id'"></a>
+            </div>
+            <nav class="nav">
+                <ul class="nav-links">
+                    <li class="dropdown-kategori">
+                        <a href="#" class="dropdown-toggle">Kategori <i class="fas fa-chevron-down" style="font-size: 0.8rem; margin-left: 4px;"></i></a>
+                        <div class="mega-menu">
+                            <div class="mega-menu-col">
+                                <h4 class="mega-menu-title">Tanaman Hias</h4>
+                                <ul>
+                                    <li><a href="/category/bambu-hoki">Bambu Hoki</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-col">
+                                <h4 class="mega-menu-title">Tanaman Berbunga</h4>
+                                <ul>
+                                    <li><a href="/category/anggrek">Anggrek</a></li>
+                                    <li><a href="/category/mawar"><i class="fas fa-award" style="color: #e74c3c;"></i> Mawar</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-col">
+                                <h4 class="mega-menu-title">Bibit Buah</h4>
+                                <ul>
+                                    <li><a href="/category/mangga">Mangga</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-col">
+                                <h4 class="mega-menu-title">Produk lain</h4>
+                                <ul>
+                                    <li><a href="/category/media-tanam">Media Tanam</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li><a href="/blog">Blog</a></li>
+                    <li><a href="/cart" class="cart-link">Keranjang <span class="badge-cart"><?= count(session()->get('cart') ?? []) ?></span></a></li>
+                    <li><a href="/login">Login</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Cari ...">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-detail-main">
+        <div class="blog-meta">
+            <span><?= esc($post['date']) ?></span>
+            <div class="social-share">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-google-plus-g"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+        
+        <h1 class="blog-detail-title"><?= esc($post['title']) ?></h1>
+        
+        <div class="blog-feature-image">
+            <img src="<?= esc($post['image']) ?>" alt="<?= esc($post['title']) ?>" onerror="this.src='https://placehold.co/800x400?text=iplant.id'">
+        </div>
+        
+        <div class="blog-content">
+            <?= $post['content'] ?>
+        </div>
+        
+        <div class="blog-meta" style="margin-top: 30px;">
+            <div></div>
+            <div class="social-share">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-google-plus-g"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+        
+        <?php if (!empty($related)): ?>
+        <div class="related-posts">
+            <h3>Blog Post Lainnya</h3>
+            <div class="blog-grid" style="margin-bottom: 0;">
+                <?php foreach ($related as $rSlug => $rPost): ?>
+                <div class="blog-card">
+                    <div class="blog-image">
+                        <a href="/blog-detail?id=<?= esc($rSlug) ?>"><img src="<?= esc($rPost['image']) ?>" alt="<?= esc($rPost['title']) ?>" onerror="this.src='https://placehold.co/400x250?text=iplant.id'"></a>
+                    </div>
+                    <div class="blog-info">
+                        <h3 class="blog-title"><a href="/blog-detail?id=<?= esc($rSlug) ?>"><?= esc($rPost['title']) ?></a></h3>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+    </main>
+
+    <!-- Black Footer -->
+    <footer class="footer-black">
+        <div class="container footer-black-container">
+            <div class="footer-black-col">
+                <h4>Links</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                    <li><a href="#">Daftar Produk</a></li>
+                    <li><a href="#">Konfirmasi Pembayaran</a></li>
+                </ul>
+            </div>
+            <div class="footer-black-col">
+                <h4>Social Media</h4>
+                <div class="social-icons-black">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                </div>
+            </div>
+            <div class="footer-black-col">
+                <h4>Hubungi Kami</h4>
+                <ul class="contact-info-black">
+                    <li><i class="fab fa-whatsapp"></i> 0831-6500-7109</li>
+                    <li><i class="far fa-envelope"></i> iplant.indonesia@gmail.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> JL Cemara Kipas No 31<br>Sidomulyo, Kota Batu.<br>Jawa Timur.</li>
+                </ul>
+            </div>
+            <div class="footer-black-col newsletter-black-col">
+                <h4>Berita Newsletter</h4>
+                <div class="newsletter-form-black">
+                    <input type="email" placeholder="Masukan email di sini">
+                    <button class="btn-subscribe">Berlangganan</button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-black-bottom">
+            <p>@2026 iPlant Inc.</p>
+        </div>
+    </footer>
+</body>
+</html>
