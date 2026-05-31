@@ -54,7 +54,12 @@
                     </li>
                     <li><a href="/blog">Blog</a></li>
                     <li><a href="/cart" class="cart-link">Keranjang <span class="badge-cart"><?= count(session()->get('cart') ?? []) ?></span></a></li>
-                    <li><a href="/login">Login</a></li>
+                    <?php if (session()->get('user')): ?>
+                        <li><a href="/account">Akun Saya</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    <?php else: ?>
+                        <li><a href="/login">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
             <div class="header-actions">
@@ -71,15 +76,19 @@
         <div class="login-box">
             <h2 class="login-title">Login</h2>
             
-            <form action="#" method="POST">
+            <?php if (session()->getFlashdata('error')): ?>
+                <div style="color:#e74c3c; margin-bottom: 12px; font-size: 0.9rem;"><?= esc(session()->getFlashdata('error')) ?></div>
+            <?php endif; ?>
+
+            <form action="/login" method="POST">
                 <div class="form-group-login">
                     <label>Email</label>
-                    <input type="email" placeholder="john@connor.com" required>
+                    <input type="email" name="email" placeholder="john@connor.com" required>
                 </div>
                 
                 <div class="form-group-login">
                     <label>Password</label>
-                    <input type="password" placeholder="******" required>
+                    <input type="password" name="password" placeholder="******" required>
                 </div>
                 
                 <div class="login-actions-row">

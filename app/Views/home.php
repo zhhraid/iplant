@@ -55,7 +55,12 @@
                     </li>
                     <li><a href="/blog">Blog</a></li>
                     <li><a href="/cart" class="cart-link">Keranjang <span class="badge-cart"><?= count(session()->get('cart') ?? []) ?></span></a></li>
-                    <li><a href="/login">Login</a></li>
+                    <?php if (session()->get('user')): ?>
+                        <li><a href="/account">Akun Saya</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    <?php else: ?>
+                        <li><a href="/login">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
             <div class="header-actions">

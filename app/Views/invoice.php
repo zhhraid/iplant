@@ -476,7 +476,12 @@
                     </li>
                     <li><a href="/blog">Blog</a></li>
                     <li><a href="/cart" class="cart-link">Keranjang <span class="badge-cart"><?= count(session()->get('cart') ?? []) ?></span></a></li>
-                    <li><a href="/login">Login</a></li>
+                    <?php if (session()->get('user')): ?>
+                        <li><a href="/account">Akun Saya</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    <?php else: ?>
+                        <li><a href="/login">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
             <div class="header-actions">
@@ -560,6 +565,51 @@
     ?>
 
     <div class="invoice-page">
+        <?php if (session()->getFlashdata('success')): ?>
+            <div style="background-color: #def7ec; color: #03543f; border: 1px solid #bcf0da; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 0.95rem; font-weight: 500;">
+                <i class="fas fa-check-circle" style="margin-right: 8px;"></i> <?= esc(session()->getFlashdata('success')) ?>
+            </div>
+        <?php endif; ?>
+        <?php if (session()->getFlashdata('error')): ?>
+            <div style="background-color: #fde8e8; color: #9b1c1c; border: 1px solid #fbd5d5; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 0.95rem; font-weight: 500;">
+                <i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i> <?= esc(session()->getFlashdata('error')) ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($isPaid): ?>
+        <!-- Simulation Helper Control Panel for Testing / Lecturer Demo -->
+        <div class="simulation-helper-box" style="background-color: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 6px; padding: 16px 20px; margin-bottom: 30px; font-size: 0.92rem; color: #334155; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: #1e293b;">
+                <span style="font-size: 1.15rem;">⚙️</span>
+                <span>Panel Simulasi Integrasi API Pelacakan Kurir (Mock API)</span>
+            </div>
+            <div style="margin-bottom: 12px; color: #64748b; line-height: 1.55;">
+                <strong>Catatan Teknis (Penjelasan Dosen):</strong> Pada sistem produksi nyata, data perjalanan (tracking events) tidak disimpan di database lokal untuk efisiensi penyimpanan. Sebagai gantinya, data diintegrasikan secara real-time melalui <strong>API Ekspedisi</strong> (seperti RajaOngkir atau Biteship) menggunakan parameter <em>Nomor Resi</em>. Panel ini disediakan sebagai <strong>Mock API</strong> untuk menyimulasikan respon transit kurir saat status pesanan telah dikonfirmasi oleh admin toko.
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <?php 
+                $currentShippingStatus = strtolower(trim($order['shipping_status'] ?? ''));
+                if (empty($currentShippingStatus) || $currentShippingStatus === 'menunggu untuk dikirim'): 
+                ?>
+                    <span style="font-weight: 600; color: #16a34a; font-size: 0.9rem;">Status: Lunas & Siap Dikirim (Awaiting Shipment)</span>
+                    <span style="color: #cbd5e1;">|</span>
+                    <a href="/invoice/<?= $order['id'] ?>/simulate-ship" class="btn-payment-confirm" style="background-color: #ea580c; padding: 8px 16px; font-size: 0.88rem; text-decoration: none; color: #fff; border-radius: 4px; font-weight: 500; display: inline-block;">
+                        Simulasikan Kirim Barang (Generate Resi Otomatis)
+                    </a>
+                <?php elseif ($currentShippingStatus === 'dalam perjalanan'): ?>
+                    <span style="font-weight: 600; color: #ea580c; font-size: 0.9rem;">Status: Sedang Dikirim (In Transit)</span>
+                    <span style="color: #cbd5e1;">|</span>
+                    <a href="/invoice/<?= $order['id'] ?>/simulate-deliver" class="btn-payment-confirm" style="background-color: #16a34a; padding: 8px 16px; font-size: 0.88rem; text-decoration: none; color: #fff; border-radius: 4px; font-weight: 500; display: inline-block;">
+                        Simulasikan Paket Sampai (Telah Diterima)
+                    </a>
+                <?php else: ?>
+                    <span style="font-weight: 600; color: #16a34a; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                        ✅ Status: Transaksi Selesai & Paket Telah Diterima.
+                    </span>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
         <!-- Header row -->
         <div class="invoice-header-row">
             <div class="invoice-title-wrapper">
@@ -668,16 +718,15 @@
                 <!-- Action buttons block -->
                 <div class="invoice-actions">
                     <?php if ($isPaid): ?>
-                    <a href="#" class="btn-review">Tulis Review</a>
-                    <button type="button" class="btn-refund" onclick="openRefundModal()">Minta Refund</button>
+                        <?php if (strtolower(trim($order['shipping_status'] ?? '')) === 'sudah sampai'): ?>
+                            <a href="/invoice/<?= $order['id'] ?>/review" class="btn-review">Tulis Review</a>
+                        <?php endif; ?>
+                        <button type="button" class="btn-refund" onclick="openRefundModal()">Minta Refund</button>
                     <?php elseif ($isWaitingConfirmation): ?>
-                    <button type="button" class="btn-refund" onclick="openRefundModal()">Minta Refund</button>
+                        <button type="button" class="btn-refund" onclick="openRefundModal()">Minta Refund</button>
                     <?php elseif (!$isCancelled && !$isRefundRequested && !$isRefundApproved): ?>
-                    <!-- WhatsApp Redirect link for Payment Confirmation -->
-                    <?php 
-                    ?>
-                    <a href="/invoice/<?= $order['id'] ?>/confirm-payment" class="btn-payment-confirm">Konfirmasi Pembayaran</a>
-                    <button type="button" class="btn-order-cancel" onclick="openCancelModal()">Batalkan Order</button>
+                        <a href="/invoice/<?= $order['id'] ?>/confirm-payment" class="btn-payment-confirm">Konfirmasi Pembayaran</a>
+                        <button type="button" class="btn-order-cancel" onclick="openCancelModal()">Batalkan Order</button>
                     <?php endif; ?>
                 </div>
             </div>

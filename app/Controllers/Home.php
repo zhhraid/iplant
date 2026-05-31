@@ -5,7 +5,8 @@ namespace App\Controllers;
 use App\Models\ProductModel;
 use App\Models\OrderModel;
 use App\Models\OrderItemModel;
-use App\Models\OrderTrackingEventModel;
+use App\Models\UserModel;
+use App\Models\ReviewModel;
 use CodeIgniter\I18n\Time;
 
 class Home extends BaseController
@@ -28,9 +29,170 @@ class Home extends BaseController
         return view('login');
     }
 
+    public function processLogin()
+    {
+        $email = trim((string) $this->request->getPost('email'));
+        $password = (string) $this->request->getPost('password');
+
+        $userModel = new UserModel();
+        $user = $userModel->where('email', $email)->first();
+
+        if (!$user || !password_verify($password, $user['password_hash']) || (int) $user['is_active'] !== 1) {
+            return redirect()->to('/login')->with('error', 'Email atau password salah');
+        }
+
+        $userModel->update($user['id'], [
+            'last_login_at' => Time::now(app_timezone())->toDateTimeString(),
+        ]);
+
+        $this->session->set('user', [
+            'id' => $user['id'],
+            'name' => $user['name'],
+            'first_name' => $user['first_name'] ?? $this->getFirstName($user['name']),
+            'last_name' => $user['last_name'] ?? $this->getLastName($user['name']),
+            'email' => $user['email'],
+            'role' => $user['role'],
+        ]);
+
+        return redirect()->to('/account');
+    }
+
     public function register(): string
     {
         return view('register');
+    }
+
+    public function processRegister()
+    {
+        $name = trim((string) $this->request->getPost('name'));
+        $email = trim((string) $this->request->getPost('email'));
+        $password = (string) $this->request->getPost('password');
+
+        $userModel = new UserModel();
+
+        if ($userModel->where('email', $email)->first()) {
+            return redirect()->to('/register')->with('error', 'Email sudah terdaftar');
+        }
+
+        $firstName = $this->getFirstName($name);
+        $lastName = $this->getLastName($name);
+        $now = Time::now(app_timezone())->toDateTimeString();
+
+        $userId = $userModel->insert([
+            'name' => $name,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+            'newsletter' => $this->request->getPost('subscribe') ? 1 : 0,
+            'role' => 'customer',
+            'is_active' => 1,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $this->session->set('user', [
+            'id' => $userId,
+            'name' => $name,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
+            'role' => 'customer',
+        ]);
+
+        return redirect()->to('/account');
+    }
+
+    public function account()
+    {
+        $user = $this->session->get('user');
+
+        if (!$user) {
+            return redirect()->to('/login');
+        }
+
+        $orderModel = new OrderModel();
+        $orderItemModel = new OrderItemModel();
+        $productModel = new ProductModel();
+
+        $orders = $orderModel
+            ->where('customer_email', $user['email'])
+            ->orderBy('created_at', 'DESC')
+            ->findAll();
+
+        foreach ($orders as &$order) {
+            $items = $orderItemModel->where('order_id', $order['id'])->findAll();
+            if (!empty($items)) {
+                $productIds = array_column($items, 'product_id');
+                $products = $productModel->whereIn('id', $productIds)->findAll();
+                $productsById = array_column($products, null, 'id');
+                foreach ($items as &$item) {
+                    $prod = $productsById[$item['product_id']] ?? null;
+                    $item['image_url'] = $prod['image_url'] ?? 'https://placehold.co/60x60?text=iplant.id';
+                }
+                unset($item);
+            }
+            $order['items'] = $items;
+        }
+        unset($order);
+
+        return view('account', [
+            'user' => $user,
+            'orders' => $orders,
+        ]);
+    }
+
+    public function changePassword()
+    {
+        $user = $this->session->get('user');
+
+        if (!$user) {
+            return redirect()->to('/login');
+        }
+
+        return view('change_password', ['user' => $user]);
+    }
+
+    public function updatePassword()
+    {
+        $sessionUser = $this->session->get('user');
+
+        if (!$sessionUser) {
+            return redirect()->to('/login');
+        }
+
+        $currentPassword = (string) $this->request->getPost('current_password');
+        $password = (string) $this->request->getPost('password');
+        $passwordConfirm = (string) $this->request->getPost('password_confirm');
+
+        if ($password !== $passwordConfirm) {
+            return redirect()->to('/change-password')->with('error', 'Konfirmasi password tidak sama');
+        }
+
+        if (strlen($password) < 6) {
+            return redirect()->to('/change-password')->with('error', 'Password baru minimal 6 karakter');
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->find($sessionUser['id']);
+
+        if (!$user || !password_verify($currentPassword, $user['password_hash'])) {
+            return redirect()->to('/change-password')->with('error', 'Password sekarang salah');
+        }
+
+        $userModel->update($user['id'], [
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+            'updated_at' => Time::now(app_timezone())->toDateTimeString(),
+        ]);
+
+        return redirect()->to('/account')->with('success', 'Password berhasil diubah');
+    }
+
+    public function logout()
+    {
+        $this->session->remove('user');
+
+        return redirect()->to('/');
     }
 
     public function forgotPassword(): string
@@ -270,7 +432,11 @@ class Home extends BaseController
 
         $cart = $this->getCheckoutCart();
         if (empty($cart)) return redirect()->to('/cart');
-        return view('checkout_info', ['cart' => $cart]);
+        $user = $this->session->get('user');
+        return view('checkout_info', [
+            'cart' => $cart,
+            'user' => $user
+        ]);
     }
     
     public function checkoutShipping()
@@ -410,7 +576,6 @@ class Home extends BaseController
         
         $orderModel = new OrderModel();
         $orderItemModel = new OrderItemModel();
-        $trackingEventModel = new OrderTrackingEventModel();
         $productModel = new ProductModel();
         
         $order = $orderModel->find($orderId);
@@ -427,11 +592,7 @@ class Home extends BaseController
         }
         unset($item);
 
-        $trackingEvents = $trackingEventModel
-            ->where('order_id', $orderId)
-            ->orderBy('sort_order', 'ASC')
-            ->orderBy('event_time', 'DESC')
-            ->findAll();
+        $trackingEvents = $this->getMockTrackingEvents($order);
         
         return view('invoice', [
             'order' => $order,
@@ -508,7 +669,6 @@ class Home extends BaseController
             'shipping_status' => 'Menunggu Untuk Dikirim',
             'delivered_at' => null,
         ]);
-        $this->ensureDefaultTrackingEvents($orderId);
 
         return redirect()->to('/invoice/' . $orderId);
     }
@@ -621,53 +781,141 @@ class Home extends BaseController
         return $this->session->get('cart') ?? [];
     }
 
-    private function ensureDefaultTrackingEvents(int $orderId): void
+    private function getFirstName(string $name): string
     {
-        $trackingEventModel = new OrderTrackingEventModel();
+        $parts = preg_split('/\s+/', trim($name));
 
-        if ($trackingEventModel->where('order_id', $orderId)->countAllResults() > 0) {
-            return;
+        return $parts[0] ?? $name;
+    }
+
+    private function getLastName(string $name): ?string
+    {
+        $parts = preg_split('/\s+/', trim($name));
+        array_shift($parts);
+
+        return empty($parts) ? null : implode(' ', $parts);
+    }
+
+    private function getMockTrackingEvents(array $order): array
+    {
+        $trackingNumber = $order['tracking_number'] ?? '';
+        if (empty($trackingNumber)) {
+            return [];
         }
+
+        $createdAt = Time::parse($order['created_at'], app_timezone());
+        $courierRaw = $order['shipping_courier'] ?? 'JNE';
+        $courier = strtoupper(explode(' - ', $courierRaw)[0] ?? 'JNE');
+        $customerName = $order['customer_name'] ?? 'penerima';
+        $city = $order['customer_city'] ?? 'tujuan';
+
+        $shipTime = (clone $createdAt)->addHours(2);
+        
+        $events = [
+            [
+                'offset' => 0, 
+                'desc' => "Paket telah diserahkan ke pihak ekspedisi ($courier) dengan nomor resi $trackingNumber."
+            ],
+            [
+                'offset' => 120,
+                'desc' => "Paket telah diterima di drop point transit asal ($courier Drop Point)."
+            ],
+            [
+                'offset' => 360,
+                'desc' => "Paket sedang dikirim ke transit center utama ($courier Transit Center)."
+            ],
+            [
+                'offset' => 720,
+                'desc' => "Paket telah sampai di transit center utama ($courier Transit Center)."
+            ],
+            [
+                'offset' => 1440,
+                'desc' => "Paket dalam pengiriman ke kota tujuan ($city Transit Center)."
+            ],
+            [
+                'offset' => 1800,
+                'desc' => "Paket telah tiba di transit center tujuan ($city Transit Center)."
+            ],
+            [
+                'offset' => 2000,
+                'desc' => "Paket dibawa oleh kurir menuju alamat penerima ($customerName)."
+            ],
+            [
+                'offset' => 2160,
+                'desc' => "Paket telah berhasil diserahkan kepada $customerName. Status: Diterima."
+            ]
+        ];
+
+        $shippingStatus = strtolower(trim($order['shipping_status'] ?? ''));
+        $result = [];
+        
+        if ($shippingStatus === 'dalam perjalanan') {
+            for ($i = 0; $i < 5; $i++) {
+                $time = (clone $shipTime)->addMinutes($events[$i]['offset']);
+                if ($time->isBefore(Time::now(app_timezone()))) {
+                    $result[] = [
+                        'event_time' => $time->toDateTimeString(),
+                        'description' => $events[$i]['desc']
+                    ];
+                }
+            }
+        } elseif ($shippingStatus === 'sudah sampai') {
+            for ($i = 0; $i < 8; $i++) {
+                $time = (clone $shipTime)->addMinutes($events[$i]['offset']);
+                if ($time->isBefore(Time::now(app_timezone()))) {
+                    $result[] = [
+                        'event_time' => $time->toDateTimeString(),
+                        'description' => $events[$i]['desc']
+                    ];
+                } else {
+                    $result[] = [
+                        'event_time' => Time::now(app_timezone())->subMinutes(8 - $i)->toDateTimeString(),
+                        'description' => $events[$i]['desc']
+                    ];
+                }
+            }
+        }
+
+        return array_reverse($result);
+    }
+
+    public function simulateShip($orderId = null)
+    {
+        if (!$orderId) return redirect()->to('/');
 
         $orderModel = new OrderModel();
         $order = $orderModel->find($orderId);
 
-        if (!$order) {
-            return;
-        }
+        if (!$order) return redirect()->to('/');
 
-        $baseTime = Time::parse($order['delivered_at'] ?? Time::now(app_timezone())->toDateTimeString(), app_timezone());
-        $customerName = $order['customer_name'] ?? 'penerima';
-        $events = [
-            [0, 'Package has been delivered to ' . $customerName . '.'],
-            [103, 'Package will be delivered to your address by Aditya Eiden'],
-            [104, 'Shipment process is being delayed for the reason: Reschedule waktu pengiriman'],
-            [557, 'Package will be delivered to your address by Aditya Gunawan'],
-            [606, 'Package has been arrived at JAKARTA Drop Point.'],
-            [611, 'Package will be departed to JAKARTA Drop Point'],
-            [629, 'Package has been arrived at JAKARTA Drop Center.'],
-            [776, 'Package will be departed to JAKARTA Drop Center'],
-            [901, 'Package has been arrived at JAKARTA Transit Center.'],
-            [1343, 'Package will be departed to JAKARTA Transit Center'],
-            [1350, 'Package has been arrived at MADIUN Transit Center.'],
-            [2400, 'Package will be departed to MADIUN Transit Center'],
-            [2406, 'Package has been arrived at MALANG Transit Center.'],
-            [2435, 'Package has been arrived at MALANG Transit Center.'],
-            [2567, 'Package has been processed at BATU Drop Point by Arief Rachman Hakim'],
-        ];
+        $courierRaw = $order['shipping_courier'] ?? 'JNE';
+        $courier = strtoupper(explode(' - ', $courierRaw)[0] ?? 'JNE');
+        $randomDigits = mt_rand(100000000, 999999999);
+        $trackingNumber = $courier . $randomDigits;
 
-        foreach ($events as $index => [$minutesBeforeDelivery, $description]) {
-            $eventTime = clone $baseTime;
-            $eventTime = $eventTime->subMinutes($minutesBeforeDelivery);
+        $orderModel->update($orderId, [
+            'tracking_number' => $trackingNumber,
+            'shipping_status' => 'Dalam Perjalanan',
+        ]);
 
-            $trackingEventModel->insert([
-                'order_id' => $orderId,
-                'event_time' => $eventTime->toDateTimeString(),
-                'description' => $description,
-                'sort_order' => $index + 1,
-                'created_at' => Time::now(app_timezone())->toDateTimeString(),
-            ]);
-        }
+        return redirect()->to('/invoice/' . $orderId);
+    }
+
+    public function simulateDeliver($orderId = null)
+    {
+        if (!$orderId) return redirect()->to('/');
+
+        $orderModel = new OrderModel();
+        $order = $orderModel->find($orderId);
+
+        if (!$order) return redirect()->to('/');
+
+        $orderModel->update($orderId, [
+            'shipping_status' => 'Sudah Sampai',
+            'delivered_at' => Time::now(app_timezone())->toDateTimeString(),
+        ]);
+
+        return redirect()->to('/invoice/' . $orderId);
     }
 
     private function calculateRates(string $destination, int $weightGrams): array
@@ -778,5 +1026,114 @@ class Home extends BaseController
             'weight_grams' => $weightGrams,
             'rates' => $rates
         ]);
+    }
+
+    public function writeReview($orderId = null)
+    {
+        if (!$orderId) return redirect()->to('/');
+
+        $orderModel = new OrderModel();
+        $order = $orderModel->find($orderId);
+        if (!$order) return redirect()->to('/');
+
+        $orderStatus = trim((string) ($order['status'] ?? 'pending'));
+        $normalizedStatus = strtolower($orderStatus);
+        $isPaid = in_array($normalizedStatus, ['terbayar', 'paid', 'sudah dibayar'], true);
+        $isDelivered = strtolower(trim($order['shipping_status'] ?? '')) === 'sudah sampai';
+
+        if (!$isPaid || !$isDelivered) {
+            return redirect()->to('/invoice/' . $orderId)->with('error', 'Review hanya dapat ditulis setelah pesanan sampai.');
+        }
+
+        $orderItemModel = new OrderItemModel();
+        $productModel = new ProductModel();
+        
+        $items = $orderItemModel->where('order_id', $orderId)->findAll();
+        $productIds = array_column($items, 'product_id');
+        $products = empty($productIds) ? [] : $productModel->whereIn('id', $productIds)->findAll();
+        $productsById = array_column($products, null, 'id');
+
+        foreach ($items as &$item) {
+            $product = $productsById[$item['product_id']] ?? null;
+            $item['image_url'] = $product['image_url'] ?? 'https://placehold.co/60x60?text=iplant.id';
+        }
+        unset($item);
+
+        // Check if reviews already exist for this order
+        $reviewModel = new ReviewModel();
+        $existingReviews = $reviewModel->where('order_id', $orderId)->findAll();
+        if (!empty($existingReviews)) {
+            return redirect()->to('/invoice/' . $orderId)->with('error', 'Anda sudah menulis ulasan untuk pesanan ini.');
+        }
+
+        return view('write_review', [
+            'order' => $order,
+            'items' => $items,
+        ]);
+    }
+
+    public function submitReview($orderId = null)
+    {
+        if (!$orderId) return redirect()->to('/');
+
+        $orderModel = new OrderModel();
+        $order = $orderModel->find($orderId);
+        if (!$order) return redirect()->to('/');
+
+        $orderStatus = trim((string) ($order['status'] ?? 'pending'));
+        $normalizedStatus = strtolower($orderStatus);
+        $isPaid = in_array($normalizedStatus, ['terbayar', 'paid', 'sudah dibayar'], true);
+        $isDelivered = strtolower(trim($order['shipping_status'] ?? '')) === 'sudah sampai';
+
+        if (!$isPaid || !$isDelivered) {
+            return redirect()->to('/invoice/' . $orderId)->with('error', 'Review hanya dapat ditulis setelah pesanan sampai.');
+        }
+
+        $reviewModel = new ReviewModel();
+        $existingReviews = $reviewModel->where('order_id', $orderId)->findAll();
+        if (!empty($existingReviews)) {
+            return redirect()->to('/invoice/' . $orderId)->with('error', 'Anda sudah menulis ulasan untuk pesanan ini.');
+        }
+
+        $orderItemModel = new OrderItemModel();
+        $items = $orderItemModel->where('order_id', $orderId)->findAll();
+
+        $userName = session()->get('user')['name'] ?? $order['customer_name'] ?? 'Customer';
+
+        // Check if destination directory exists
+        $uploadDir = FCPATH . 'uploads/reviews';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        foreach ($items as $item) {
+            $productId = $item['product_id'];
+            
+            // Get rating & review text for this specific product ID
+            $ratings = $this->request->getPost("ratings");
+            $rating = $ratings[$productId] ?? 5;
+            
+            $reviews = $this->request->getPost("reviews");
+            $reviewText = $reviews[$productId] ?? '';
+            
+            $imageUrl = null;
+            $file = $this->request->getFile("photos.{$productId}");
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move($uploadDir, $newName);
+                $imageUrl = '/uploads/reviews/' . $newName;
+            }
+
+            $reviewModel->insert([
+                'order_id'    => $orderId,
+                'product_id'  => $productId,
+                'user_name'   => $userName,
+                'rating'      => (int) $rating,
+                'review_text' => $reviewText,
+                'image_url'   => $imageUrl,
+            ]);
+        }
+
+        return redirect()->to('/invoice/' . $orderId)->with('success', 'Ulasan Anda berhasil dikirim. Terima kasih!');
     }
 }

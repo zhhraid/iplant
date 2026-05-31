@@ -26,15 +26,19 @@
                 </div>
                 
                 <form action="/checkout/shipping" method="POST" id="checkoutInfoForm">
-                    <div class="form-group-new">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" placeholder="john@connor.com" required>
-                    </div>
-                    
-                    <div class="checkbox-group-new">
-                        <input type="checkbox" name="newsletter" id="newsletter">
-                        <label for="newsletter">Berlangganan ke newsletter</label>
-                    </div>
+                    <?php if (!empty($user)): ?>
+                        <input type="hidden" id="email" name="email" value="<?= esc($user['email']) ?>">
+                    <?php else: ?>
+                        <div class="form-group-new">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="john@connor.com" required>
+                        </div>
+                        
+                        <div class="checkbox-group-new">
+                            <input type="checkbox" name="newsletter" id="newsletter">
+                            <label for="newsletter">Berlangganan ke newsletter</label>
+                        </div>
+                    <?php endif; ?>
                     
                     <h3 class="checkout-section-title">Alamat Pengiriman</h3>
                     

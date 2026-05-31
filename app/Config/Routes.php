@@ -5,7 +5,13 @@ use CodeIgniter\Router\RouteCollection;
 /** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
 $routes->get('/login', 'Home::login');
+$routes->post('/login', 'Home::processLogin');
 $routes->get('/register', 'Home::register');
+$routes->post('/register', 'Home::processRegister');
+$routes->get('/account', 'Home::account');
+$routes->get('/change-password', 'Home::changePassword');
+$routes->post('/change-password', 'Home::updatePassword');
+$routes->get('/logout', 'Home::logout');
 $routes->get('/forgot-password', 'Home::forgotPassword');
 $routes->get('/category', 'Home::category');
 $routes->get('/category/(:any)', 'Home::category/$1');
@@ -39,3 +45,7 @@ $routes->post('/invoice/(:num)/confirm-payment', 'Home::submitPaymentConfirmatio
 $routes->post('/invoice/(:num)/confirm-payment/approve', 'Home::approvePayment/$1');
 $routes->post('/invoice/(:num)/refund', 'Home::requestRefund/$1');
 $routes->post('/invoice/(:num)/refund/approve', 'Home::approveRefund/$1');
+$routes->get('/invoice/(:num)/simulate-ship', 'Home::simulateShip/$1');
+$routes->get('/invoice/(:num)/simulate-deliver', 'Home::simulateDeliver/$1');
+$routes->get('/invoice/(:num)/review', 'Home::writeReview/$1');
+$routes->post('/invoice/(:num)/review/submit', 'Home::submitReview/$1');

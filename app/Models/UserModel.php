@@ -4,20 +4,29 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class OrderTrackingEventModel extends Model
+class UserModel extends Model
 {
-    protected $table = 'order_tracking_events';
+    protected $table = 'users';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        'order_id',
-        'event_time',
-        'description',
-        'sort_order',
+        'name',
+        'first_name',
+        'last_name',
+        'email',
+        'password_hash',
+        'newsletter',
+        'role',
+        'is_active',
+        'remember_token',
+        'reset_token',
+        'reset_token_expires_at',
+        'last_login_at',
         'created_at',
+        'updated_at',
     ];
 
     protected bool $allowEmptyInserts = false;

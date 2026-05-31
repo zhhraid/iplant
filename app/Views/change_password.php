@@ -3,18 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Baru - iplant.id</title>
-    <!-- Google Fonts: Inter -->
+    <title>Ubah Password - iplant.id</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            background: #fff;
+        }
+        .password-main {
+            min-height: 455px;
+            padding: 100px 15px 72px;
+        }
+        .password-box {
+            width: 100%;
+            max-width: 416px;
+            margin: 0 auto;
+        }
+        .password-title {
+            font-size: 1.55rem;
+            font-weight: 500;
+            color: #1f2933;
+            margin: 0 0 14px;
+        }
+        .password-field {
+            margin-bottom: 8px;
+        }
+        .password-field label {
+            display: block;
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        .password-field input {
+            width: 100%;
+            height: 36px;
+            border: 1px solid #d8d8d8;
+            border-radius: 4px;
+            padding: 6px 9px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .password-submit {
+            width: 100%;
+            height: 42px;
+            margin-top: 8px;
+            border: 0;
+            border-radius: 4px;
+            background: #2698ed;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .auth-email-pill {
+            background: #eaf2ff;
+            color: #000;
+            padding: 9px 12px;
+            border-radius: 5px;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        .form-message {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .form-message.error {
+            color: #e74c3c;
+        }
+        .form-message.success {
+            color: #2e9f45;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="container header-container">
             <div class="logo">
@@ -53,70 +118,53 @@
                         </div>
                     </li>
                     <li><a href="/blog">Blog</a></li>
-                    <li><a href="/cart" class="cart-link">Keranjang <span class="badge-cart"><?= count(session()->get('cart') ?? []) ?></span></a></li>
-                    <?php if (session()->get('user')): ?>
-                        <li><a href="/account">Akun Saya</a></li>
-                        <li><a href="/logout">Logout</a></li>
-                    <?php else: ?>
-                        <li><a href="/login">Login</a></li>
-                    <?php endif; ?>
+                    <li><a href="/cart" class="cart-link">Keranjang</a></li>
+                    <li><a href="/account">Akun Saya</a></li>
+                    <li><a href="/logout">Logout</a></li>
                 </ul>
             </nav>
             <div class="header-actions">
-                <div class="search-box">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" placeholder="Cari ...">
-                </div>
+                <div class="auth-email-pill"><?= esc($user['email']) ?></div>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="login-main">
-        <div class="login-box">
-            <h2 class="login-title">Daftar Baru</h2>
-            
+    <main class="password-main">
+        <div class="password-box">
+            <h1 class="password-title">Ubah Password</h1>
+
             <?php if (session()->getFlashdata('error')): ?>
-                <div style="color:#e74c3c; margin-bottom: 12px; font-size: 0.9rem;"><?= esc(session()->getFlashdata('error')) ?></div>
+                <div class="form-message error"><?= esc(session()->getFlashdata('error')) ?></div>
+            <?php endif; ?>
+            <?php if (session()->getFlashdata('success')): ?>
+                <div class="form-message success"><?= esc(session()->getFlashdata('success')) ?></div>
             <?php endif; ?>
 
-            <form action="/register" method="POST">
-                <div class="form-group-login">
-                    <label>Nama</label>
-                    <input type="text" name="name" placeholder="John" required>
+            <form action="/change-password" method="POST">
+                <div class="password-field">
+                    <label for="current_password">Password Sekarang</label>
+                    <input type="password" id="current_password" name="current_password" placeholder="******" required autofocus>
                 </div>
-
-                <div class="form-group-login">
-                    <label>Email</label>
-                    <input type="email" name="email" placeholder="john@connor.com" required>
+                <div class="password-field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="******" required>
                 </div>
-                
-                <div class="form-group-login">
-                    <label>Password</label>
-                    <input type="password" name="password" placeholder="******" required>
+                <div class="password-field">
+                    <label for="password_confirm">Konfirmasi Password</label>
+                    <input type="password" id="password_confirm" name="password_confirm" placeholder="******" required>
                 </div>
-
-                <div class="form-group-checkbox">
-                    <input type="checkbox" id="subscribe" name="subscribe">
-                    <label for="subscribe">Berlangganan ke newsletter</label>
-                </div>
-                
-                <div class="login-actions-row">
-                    <button type="submit" class="btn-login-submit">Daftar Baru</button>
-                    <a href="/login" class="btn-register-link">Login</a>
-                </div>
+                <button type="submit" class="password-submit">Ubah Password</button>
             </form>
         </div>
     </main>
 
-    <!-- Black Footer -->
     <footer class="footer-black">
         <div class="container footer-black-container">
             <div class="footer-black-col">
                 <h4>Links</h4>
                 <ul>
                     <li><a href="/">Home</a></li>
-                    <li><a href="#">Blog</a></li>
+                    <li><a href="/blog">Blog</a></li>
                     <li><a href="#">Daftar Produk</a></li>
                     <li><a href="#">Konfirmasi Pembayaran</a></li>
                 </ul>
