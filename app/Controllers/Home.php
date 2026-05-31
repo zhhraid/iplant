@@ -594,10 +594,14 @@ class Home extends BaseController
 
         $trackingEvents = $this->getMockTrackingEvents($order);
         
+        $reviewModel = new ReviewModel();
+        $hasReviewed = $reviewModel->where('order_id', $orderId)->countAllResults() > 0;
+
         return view('invoice', [
             'order' => $order,
             'items' => $items,
             'trackingEvents' => $trackingEvents,
+            'hasReviewed' => $hasReviewed,
         ]);
     }
 
@@ -681,6 +685,13 @@ class Home extends BaseController
         $order = $orderModel->find($orderId);
 
         if (!$order) return redirect()->to('/');
+
+        $reviewModel = new ReviewModel();
+        $hasReviewed = $reviewModel->where('order_id', $orderId)->countAllResults() > 0;
+        if ($hasReviewed) {
+            return redirect()->to('/invoice/' . $orderId)->with('error', 'Tidak dapat meminta refund setelah memberikan ulasan.');
+        }
+
         if ($this->request->getPost('refund_confirmation') !== 'yes') {
             return redirect()->to('/invoice/' . $orderId);
         }
@@ -966,37 +977,37 @@ class Home extends BaseController
                 'name' => 'JNE',
                 'logo' => '/images/expeditions/jne.png',
                 'services' => [
-                    'REG' => ['name' => 'REG', 'cost' => $jne_reg, 'etd' => '2-3 Hari'],
-                    'YES' => ['name' => 'YES', 'cost' => $jne_yes, 'etd' => '1 Hari'],
-                    'JTR' => ['name' => 'JTR', 'cost' => $jne_jtr, 'etd' => '5-7 Hari']
+                    'REG' => ['name' => 'REG', 'cost' => $jne_reg, 'etd' => '1-2 hari'],
+                    'YES' => ['name' => 'YES', 'cost' => $jne_yes, 'etd' => '1-1 hari'],
+                    'JTR' => ['name' => 'JTR', 'cost' => $jne_jtr, 'etd' => '5-6 hari']
                 ]
             ],
             'jnt' => [
-                'name' => 'J&T Express',
+                'name' => 'J&T',
                 'logo' => '/images/expeditions/jnt.png',
                 'services' => [
-                    'Regular' => ['name' => 'Regular', 'cost' => $jnt_reg, 'etd' => '2-3 Hari']
+                    'Reguler' => ['name' => 'Reguler', 'cost' => $jnt_reg, 'etd' => '? hari']
                 ]
             ],
             'tiki' => [
                 'name' => 'TIKI',
                 'logo' => '/images/expeditions/tiki.png',
                 'services' => [
-                    'Regular' => ['name' => 'Regular', 'cost' => $tiki_reg, 'etd' => '2-3 Hari']
-                ]
-            ],
-            'lion' => [
-                'name' => 'Lion Parcel',
-                'logo' => '/images/expeditions/lion.png',
-                'services' => [
-                    'REGPACK' => ['name' => 'REGPACK', 'cost' => $lion_reg, 'etd' => '2-3 Hari']
+                    'Reguler' => ['name' => 'Reguler', 'cost' => $tiki_reg, 'etd' => '2 day hari']
                 ]
             ],
             'pos' => [
-                'name' => 'POS Indonesia',
+                'name' => 'POS',
                 'logo' => '/images/expeditions/pos.png',
                 'services' => [
-                    'Kilat' => ['name' => 'Kilat', 'cost' => $pos_kilat, 'etd' => '2-4 Hari']
+                    'Kilat' => ['name' => 'Kilat', 'cost' => $pos_kilat, 'etd' => '3 day hari']
+                ]
+            ],
+            'lion' => [
+                'name' => 'LION',
+                'logo' => '/images/expeditions/lion.png',
+                'services' => [
+                    'Regpack' => ['name' => 'Regpack', 'cost' => $lion_reg, 'etd' => '2-4 day hari']
                 ]
             ]
         ];
@@ -1135,5 +1146,75 @@ class Home extends BaseController
         }
 
         return redirect()->to('/invoice/' . $orderId)->with('success', 'Ulasan Anda berhasil dikirim. Terima kasih!');
+    }
+
+    public function getProvinces()
+    {
+        $filePath = FCPATH . 'data/provinces.json';
+        if (!is_file($filePath)) {
+            $dir = dirname($filePath);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
+            }
+            $data = @file_get_contents('https://emsifa.github.io/api-wilayah-indonesia/api/provinces.json');
+            if ($data !== false) {
+                file_put_contents($filePath, $data);
+            } else {
+                return $this->response->setJSON([]);
+            }
+        } else {
+            $data = file_get_contents($filePath);
+        }
+        return $this->response->setHeader('Content-Type', 'application/json')->setBody($data);
+    }
+
+    public function getRegencies()
+    {
+        $provinceId = $this->request->getGet('province_id');
+        if (empty($provinceId)) {
+            return $this->response->setJSON([]);
+        }
+
+        $filePath = FCPATH . 'data/regencies/' . $provinceId . '.json';
+        if (!is_file($filePath)) {
+            $dir = dirname($filePath);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
+            }
+            $data = @file_get_contents("https://emsifa.github.io/api-wilayah-indonesia/api/regencies/{$provinceId}.json");
+            if ($data !== false) {
+                file_put_contents($filePath, $data);
+            } else {
+                return $this->response->setJSON([]);
+            }
+        } else {
+            $data = file_get_contents($filePath);
+        }
+        return $this->response->setHeader('Content-Type', 'application/json')->setBody($data);
+    }
+
+    public function getDistricts()
+    {
+        $regencyId = $this->request->getGet('regency_id');
+        if (empty($regencyId)) {
+            return $this->response->setJSON([]);
+        }
+
+        $filePath = FCPATH . 'data/districts/' . $regencyId . '.json';
+        if (!is_file($filePath)) {
+            $dir = dirname($filePath);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
+            }
+            $data = @file_get_contents("https://emsifa.github.io/api-wilayah-indonesia/api/districts/{$regencyId}.json");
+            if ($data !== false) {
+                file_put_contents($filePath, $data);
+            } else {
+                return $this->response->setJSON([]);
+            }
+        } else {
+            $data = file_get_contents($filePath);
+        }
+        return $this->response->setHeader('Content-Type', 'application/json')->setBody($data);
     }
 }

@@ -719,9 +719,17 @@
                 <div class="invoice-actions">
                     <?php if ($isPaid): ?>
                         <?php if (strtolower(trim($order['shipping_status'] ?? '')) === 'sudah sampai'): ?>
-                            <a href="/invoice/<?= $order['id'] ?>/review" class="btn-review">Tulis Review</a>
+                            <?php if (isset($hasReviewed) && $hasReviewed): ?>
+                                <span style="color: #27ae60; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 6px; padding: 10px 0;">
+                                    <i class="fas fa-check-circle"></i> Sudah Diulas
+                                </span>
+                            <?php else: ?>
+                                <a href="/invoice/<?= $order['id'] ?>/review" class="btn-review">Tulis Review</a>
+                                <button type="button" class="btn-refund" onclick="openRefundModal()">Minta Refund</button>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <button type="button" class="btn-refund" onclick="openRefundModal()">Minta Refund</button>
                         <?php endif; ?>
-                        <button type="button" class="btn-refund" onclick="openRefundModal()">Minta Refund</button>
                     <?php elseif ($isWaitingConfirmation): ?>
                         <button type="button" class="btn-refund" onclick="openRefundModal()">Minta Refund</button>
                     <?php elseif (!$isCancelled && !$isRefundRequested && !$isRefundApproved): ?>

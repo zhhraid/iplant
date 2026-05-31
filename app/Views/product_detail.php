@@ -82,103 +82,103 @@
         $productName = $product['name'] ?? '';
         $productImagesMap = [
             'Bambu Rejeki Fire Ring' => [
-                '/images/products/Bambu Rejeki Fire Ring.png',
+                '/images/products/Bambu Rejeki Fire Ring Clean.png',
                 '/images/products/Bambu Rejeki Fire Ring 2.png',
                 '/images/products/Bambu Rejeki Fire Ring 3.png',
             ],
             'Bambu Rejeki 3 Tingkat (M)' => [
-                '/images/products/Bambu Rejeki 3 Tingkat (M).png',
+                '/images/products/Bambu Rejeki 3 Tingkat (M) Clean.png',
                 '/images/products/Bambu Rejeki 3 Tingkat (M) 2.png',
                 '/images/products/Bambu Rejeki 3 Tingkat (M) 3.png',
             ],
             'Bambu Rejeki Triangle Vas' => [
-                '/images/products/Bambu Rejeki Triangle Vas.png',
+                '/images/products/Bambu Rejeki Triangle Vas Clean.png',
             ],
             'Bambu Rejeki Vas Variegata' => [
-                '/images/products/Bambu Rejeki Vas Variegata.png',
+                '/images/products/Bambu Rejeki Vas Variegata Clean.png',
                 '/images/products/Bambu Rejeki Vas Variegata 2.png',
             ],
             'Bambu Rejeki Curly Vas' => [
-                '/images/products/Bambu Rejeki Curly Vas.png',
+                '/images/products/Bambu Rejeki Curly Vas Clean.png',
                 '/images/products/Bambu Rejeki Curly Vas 2.png',
             ],
             'Bambu Rejeki Pagoda 5' => [
-                '/images/products/Bambu Rejeki Pagoda 5.png',
+                '/images/products/Bambu Rejeki Pagoda 5 Clean.png',
                 '/images/products/Bambu Rejeki Pagoda 5 2.png',
             ],
             'Anggrek Bulan Mini Kuning' => [
-                '/images/products/Anggrek Bulan Mini Kuning.png',
+                '/images/products/Anggrek Bulan Mini Kuning Clean.png',
                 '/images/products/Anggrek Bulan Mini Kuning 2.png',
             ],
             'Anggrek Bulan Mini Putih' => [
-                '/images/products/Anggrek Bulan Mini Putih.png',
+                '/images/products/Anggrek Bulan Mini Putih Clean.png',
             ],
             'Cymbidium Chen\'s Ruby' => [
-                '/images/products/Cymbidium Chen\'s Ruby.png',
+                '/images/products/Cymbidium Chen\'s Ruby Clean.png',
             ],
             'Anggrek Bulan Mini Purple' => [
-                '/images/products/Anggrek Bulan Mini Purple.png',
+                '/images/products/Anggrek Bulan Mini Purple Clean.png',
             ],
             'Anggrek Bulan Black Jack' => [
-                '/images/products/Anggrek Bulan Black Jack.png',
+                '/images/products/Anggrek Bulan Black Jack Clean.png',
             ],
             'Anggrek Cattleya Pra-Remaja' => [
-                '/images/products/Anggrek Cattleya Pra-Remaja.png',
+                '/images/products/Anggrek Cattleya Pra-Remaja Clean.png',
             ],
             'Mawar Impor Emilien' => [
-                '/images/products/Mawar Impor Emilien.png',
+                '/images/products/Mawar Impor Emilien Clean.png',
                 '/images/products/Mawar Impor Emilien 2.jpg',
             ],
             'Blue Moonstone Rose' => [
-                '/images/products/Blue Moonstone Rose.png',
+                '/images/products/Blue Moonstone Rose Clean.png',
             ],
             'Mawar Impor Kahala' => [
-                '/images/products/Mawar Impor Kahala.png',
+                '/images/products/Mawar Impor Kahala Clean.png',
             ],
             'Mawar Impor Aube' => [
-                '/images/products/Mawar Impor Aube.png',
+                '/images/products/Mawar Impor Aube Clean.png',
             ],
             'Mawar Impor Minion Putih' => [
-                '/images/products/Mawar Impor Minion Putih.png',
+                '/images/products/Mawar Impor Minion Putih Clean.png',
             ],
             'Mawar Rambat Orange' => [
-                '/images/products/Mawar Rambat Orange.png',
+                '/images/products/Mawar Rambat Orange Clean.png',
             ],
             'Mangga Irwin (Jumbo)' => [
-                '/images/products/Mangga Irwin (Jumbo).png',
+                '/images/products/Mangga Irwin (Jumbo) Clean.png',
             ],
             'Mangga Kiojay (Berbuah)' => [
-                '/images/products/Mangga Kiojay (Berbuah).png',
+                '/images/products/Mangga Kiojay (Berbuah) Clean.png',
             ],
             'Mangga Mahatir' => [
-                '/images/products/Mangga Mahatir.png',
+                '/images/products/Mangga Mahatir Clean.png',
             ],
             'Mangga Apel' => [
-                '/images/products/Mangga Apel.png',
+                '/images/products/Mangga Apel Clean.png',
             ],
             'Mangga Gajah' => [
-                '/images/products/Mangga Gajah.png',
+                '/images/products/Mangga Gajah Clean.png',
             ],
             'Mangga Kiojay' => [
-                '/images/products/Mangga Kiojay.png',
+                '/images/products/Mangga Kiojay Clean.png',
             ],
             'Media Tanam Forest Moss 250gr' => [
-                '/images/products/Media Tanam Forest Moss 250gr.png',
+                '/images/products/Media Tanam Forest Moss 250gr Clean.png',
             ],
             'Media Semai Premium 500gr' => [
-                '/images/products/Media Semai Premium 500gr.png',
+                '/images/products/Media Semai Premium 500gr Clean.png',
             ],
             'Rockwool 15cm | Media Semai Benih' => [
-                '/images/products/Rockwall 15cm  Media Semai Benih.png',
+                '/images/products/Rockwall 15cm  Media Semai Benih Clean.png',
             ],
             'Media Tanam Akadama 1 Karung' => [
-                '/images/products/Media Tanam Akadama 1 Karung.png',
+                '/images/products/Media Tanam Akadama 1 Karung Clean.png',
             ],
             'Media Tanam Premium AKADAMA' => [
-                '/images/products/Media Tanam Premium AKADAMA.png',
+                '/images/products/Media Tanam Premium AKADAMA Clean.png',
             ],
             'Media Tanam Kaktus Premium' => [
-                '/images/products/Media Tanam Kaktus Premium.png',
+                '/images/products/Media Tanam Kaktus Premium Clean.png',
             ],
         ];
 

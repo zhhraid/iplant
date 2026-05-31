@@ -49,3 +49,6 @@ $routes->get('/invoice/(:num)/simulate-ship', 'Home::simulateShip/$1');
 $routes->get('/invoice/(:num)/simulate-deliver', 'Home::simulateDeliver/$1');
 $routes->get('/invoice/(:num)/review', 'Home::writeReview/$1');
 $routes->post('/invoice/(:num)/review/submit', 'Home::submitReview/$1');
+$routes->get('/shipping/regions/provinces', 'Home::getProvinces');
+$routes->get('/shipping/regions/regencies', 'Home::getRegencies');
+$routes->get('/shipping/regions/districts', 'Home::getDistricts');

@@ -12,6 +12,142 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .shipping-section {
+            padding: 60px 0;
+            background: #ffffff;
+            border-top: 1px solid #f1f5f9;
+        }
+        .shipping-title {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 45px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.5px;
+        }
+        .shipping-grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 50px;
+            max-width: 1050px;
+            margin: 0 auto;
+            align-items: start;
+        }
+        @media (max-width: 768px) {
+            .shipping-grid-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+        .shipping-form-col {
+            background: #ffffff;
+        }
+        .shipping-results-col {
+            background: #ffffff;
+            min-height: 200px;
+        }
+        .shipping-form-group {
+            margin-bottom: 20px;
+        }
+        .shipping-form-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #475569;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .shipping-select, .shipping-input {
+            width: 100%;
+            height: 44px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0 12px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: #1e293b;
+            outline: none;
+            background-color: #ffffff;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .shipping-select:focus, .shipping-input:focus {
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+        }
+        .shipping-select:disabled {
+            background-color: #f8fafc;
+            cursor: not-allowed;
+            color: #94a3b8;
+            border-color: #e2e8f0;
+        }
+        .shipping-btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        .btn-cek-ongkir {
+            flex: 1;
+            height: 44px;
+            background-color: #2196f3;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-cek-ongkir:hover {
+            background-color: #1976d2;
+        }
+        .btn-batal-ongkir {
+            flex: 1;
+            height: 44px;
+            background-color: #ffffff;
+            color: #2196f3;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .btn-batal-ongkir:hover {
+            background-color: #f0f7ff;
+            border-color: #2196f3;
+        }
+        .results-header-text {
+            text-align: center;
+            font-style: italic;
+            font-size: 1rem;
+            color: #475569;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .shipping-results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        .shipping-results-table th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #e2e8f0;
+            color: #475569;
+            font-weight: 600;
+        }
+        .shipping-results-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+            vertical-align: middle;
+        }
+        .shipping-results-table tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -90,40 +226,14 @@
                         $nameParts = explode(' ', $p['name'], 3);
                         $titleTop = isset($nameParts[1]) ? $nameParts[0] . ' ' . $nameParts[1] : $p['name'];
                         $titleBottom = isset($nameParts[2]) ? $nameParts[2] : '';
-
-                        // Determine subcategory close up image
-                        $closeUpImage = 'https://images.unsplash.com/photo-1549241520-425e3dfc01cb?w=120&h=90&fit=crop'; // default (mawar)
-                        if ($p['subcategory'] === 'Bambu Hoki') {
-                            $closeUpImage = 'https://images.unsplash.com/photo-1534710961216-75c9d402f03e?w=120&h=90&fit=crop';
-                        } elseif ($p['subcategory'] === 'Anggrek') {
-                            $closeUpImage = 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=120&h=90&fit=crop';
-                        } elseif ($p['subcategory'] === 'Mawar') {
-                            $closeUpImage = '/images/products/mawar-close.jpg';
-                        } elseif ($p['subcategory'] === 'Mangga') {
-                            $closeUpImage = 'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=120&h=90&fit=crop';
-                        } elseif ($p['subcategory'] === 'Media Tanam') {
-                            $closeUpImage = 'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=120&h=90&fit=crop';
-                        }
                         ?>
                         <div class="product-title-top"><?= esc($titleTop) ?><br><?= esc($titleBottom) ?></div>
                         <div class="product-top-right">
                             <img src="/images/logo.png" alt="iplant.id" class="small-logo" onerror="this.style.display='none'">
-                            <img src="<?= $closeUpImage ?>" alt="<?= esc($p['subcategory']) ?> close up" class="product-close-up" onerror="this.src='https://images.unsplash.com/photo-1549241520-425e3dfc01cb?w=120&h=90&fit=crop'">
                         </div>
                     </div>
                     
                     <div class="product-main-image-container">
-                        <div class="plant-specs">
-                            <?php if (stripos($p['name'], 'bambu') !== false): ?>
-                                <div class="spec-item"><span class="spec-icon"><i class="fas fa-ruler-vertical"></i></span> <span>20-30 cm</span></div>
-                                <div class="spec-item"><span class="spec-icon"><i class="fas fa-sun"></i></span> <span>partial sun</span></div>
-                                <div class="spec-item"><span class="spec-icon"><i class="fas fa-tint"></i></span> <span>1x sehari</span></div>
-                            <?php else: ?>
-                                <div class="spec-item"><span class="spec-icon"><i class="fas fa-ruler-vertical"></i></span> <span>30-40 cm</span></div>
-                                <div class="spec-item"><span class="spec-icon"><i class="fas fa-sun"></i></span> <span>full sun</span></div>
-                                <div class="spec-item"><span class="spec-icon"><i class="fas fa-tint"></i></span> <span>2x sehari</span></div>
-                            <?php endif; ?>
-                        </div>
                         <img src="<?= esc($p['image_url']) ?>" alt="<?= esc($p['name']) ?>" class="product-main-image" onerror="this.src='https://placehold.co/200x250?text=iplant.id'">
                     </div>
                     
@@ -175,73 +285,67 @@
     <section class="shipping-section">
         <div class="container">
             <h2 class="shipping-title">Cek Ongkos Kirim</h2>
-            <div class="shipping-form" style="position: relative;">
-                <div class="form-group">
-                    <label>Asal</label>
-                    <select disabled style="background-color: #f5f5f5; cursor: not-allowed;">
-                        <option>Kota Makassar</option>
-                    </select>
+            
+            <div class="shipping-grid-container">
+                <!-- Left Column: Form -->
+                <div class="shipping-form-col">
+                    <div class="shipping-form-group">
+                        <label for="home_province">Provinsi</label>
+                        <select id="home_province" class="shipping-select" onchange="onProvinceChange()">
+                            <option value="">Pilih Provinsi</option>
+                        </select>
+                    </div>
+
+                    <div class="shipping-form-group">
+                        <label for="home_city_kab">Kota/Kabupaten</label>
+                        <select id="home_city_kab" class="shipping-select" onchange="onCityChange()" disabled>
+                            <option value="">Pilih Kota/Kabupaten</option>
+                        </select>
+                    </div>
+
+                    <div class="shipping-form-group">
+                        <label for="home_district">Kecamatan</label>
+                        <select id="home_district" class="shipping-select" disabled>
+                            <option value="">Pilih Kecamatan</option>
+                        </select>
+                    </div>
+
+                    <div class="shipping-form-group">
+                        <label for="home_weight">Berat (kg)</label>
+                        <input type="number" id="home_weight" class="shipping-input" value="1" min="0.1" step="0.1" required>
+                    </div>
+
+                    <div class="shipping-btn-group">
+                        <button type="button" class="btn-cek-ongkir" onclick="checkShippingRates()">Cek Ongkir</button>
+                        <button type="button" class="btn-batal-ongkir" onclick="resetShippingForm()">Batal</button>
+                    </div>
                 </div>
-                
-                <!-- Searchable Custom Dropdown for Kota/Kabupaten -->
-                <div class="form-group" style="position: relative;">
-                    <label for="home_city_trigger">Tujuan</label>
-                    <input type="hidden" id="home_city" name="destination" required>
-                    <div id="home_city_trigger" class="custom-select-trigger" onclick="toggleHomeCityDropdown(event)">
-                        <span id="home_city_selected_text" style="color: #999;">Pilih Kota/Kabupaten</span>
-                        <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: #999;"></i>
+
+                <!-- Right Column: Results -->
+                <div class="shipping-results-col" id="home_shipping_results_wrapper">
+                    <!-- Displayed dynamically, initially showing placeholder or empty state -->
+                    <div id="results_placeholder" style="text-align: center; padding: 50px 20px; color: #94a3b8; border: 1px dashed #cbd5e1; border-radius: 8px;">
+                        <i class="fas fa-truck" style="font-size: 3rem; margin-bottom: 15px; color: #cbd5e1;"></i>
+                        <p style="margin: 0; font-size: 0.95rem;">Masukkan tujuan dan berat barang, lalu klik "Cek Ongkir" untuk melihat daftar tarif pengiriman.</p>
                     </div>
                     
-                    <div id="home_city_dropdown" class="custom-select-dropdown" style="display: none; width: 100%;">
-                        <div class="dropdown-arrow"></div>
-                        <div class="dropdown-search-wrapper">
-                            <input type="text" id="home_city_search_input" placeholder="Cari..." autocomplete="off" oninput="filterHomeCities(this.value)" onclick="event.stopPropagation()">
-                            <button type="button" class="dropdown-search-btn" onclick="event.stopPropagation()">
-                                <i class="fas fa-search" style="color: #aaa;"></i>
-                            </button>
-                        </div>
-                        <ul id="home_city_options_list" class="dropdown-options-list">
-                            <li class="dropdown-message">Ketik 3 huruf</li>
-                        </ul>
+                    <div id="home_shipping_results" style="display: none;">
+                        <div class="results-header-text" id="results_header_location">Jakarta Pusat (1 kg)</div>
+                        <table class="shipping-results-table">
+                            <thead>
+                                <tr>
+                                    <th>Kurir</th>
+                                    <th>Layanan</th>
+                                    <th style="text-align: right; padding-right: 25px;">Harga</th>
+                                    <th>Estimasi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="home_shipping_results_body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label>Kurir</label>
-                    <select id="home_courier">
-                        <option value="all">Semua Kurir</option>
-                        <option value="jne">JNE</option>
-                        <option value="jnt">J&T Express</option>
-                        <option value="tiki">TIKI</option>
-                        <option value="lion">Lion Parcel</option>
-                        <option value="pos">POS Indonesia</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Berat (g)</label>
-                    <input type="number" id="home_weight" value="1000" min="1" required>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-primary" onclick="checkShippingRates()">Cek Ongkir</button>
-                    <button type="button" class="btn btn-outline" onclick="resetShippingForm()">Batal</button>
-                </div>
-            </div>
-            
-            <!-- Shipping Results Table -->
-            <div class="shipping-results" id="home_shipping_results" style="display: none; margin-top: 30px;">
-                <table style="width: 100%; border-collapse: collapse; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden;">
-                    <thead>
-                        <tr style="background-color: #f5f5f5; border-bottom: 2px solid #eaeaea;">
-                            <th style="padding: 15px; text-align: left; font-weight: 600; color: #333;">Kurir</th>
-                            <th style="padding: 15px; text-align: left; font-weight: 600; color: #333;">Layanan</th>
-                            <th style="padding: 15px; text-align: left; font-weight: 600; color: #333;">Biaya</th>
-                            <th style="padding: 15px; text-align: left; font-weight: 600; color: #333;">Estimasi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="home_shipping_results_body">
-                        <!-- Filled dynamically -->
-                    </tbody>
-                </table>
             </div>
         </div>
     </section>
@@ -311,267 +415,131 @@
             if (container) container.style.display = 'none';
         }
 
-        // --- Cek Ongkir Feature ---
-        const wilayahIndonesia = [
-          "DKI Jakarta, Jakarta Pusat, Gambir",
-          "DKI Jakarta, Jakarta Pusat, Sawah Besar",
-          "DKI Jakarta, Jakarta Pusat, Kemayoran",
-          "DKI Jakarta, Jakarta Pusat, Senen",
-          "DKI Jakarta, Jakarta Pusat, Cempaka Putih",
-          "DKI Jakarta, Jakarta Pusat, Menteng",
-          "DKI Jakarta, Jakarta Pusat, Tanah Abang",
-          "DKI Jakarta, Jakarta Pusat, Johar Baru",
-
-          "DKI Jakarta, Jakarta Utara, Penjaringan",
-          "DKI Jakarta, Jakarta Utara, Pademangan",
-          "DKI Jakarta, Jakarta Utara, Tanjung Priok",
-          "DKI Jakarta, Jakarta Utara, Koja",
-          "DKI Jakarta, Jakarta Utara, Kelapa Gading",
-          "DKI Jakarta, Jakarta Utara, Cilincing",
-
-          "DKI Jakarta, Jakarta Barat, Cengkareng",
-          "DKI Jakarta, Jakarta Barat, Grogol Petamburan",
-          "DKI Jakarta, Jakarta Barat, Taman Sari",
-          "DKI Jakarta, Jakarta Barat, Tambora",
-          "DKI Jakarta, Jakarta Barat, Kebon Jeruk",
-          "DKI Jakarta, Jakarta Barat, Kalideres",
-          "DKI Jakarta, Jakarta Barat, Palmerah",
-          "DKI Jakarta, Jakarta Barat, Kembangan",
-
-          "DKI Jakarta, Jakarta Selatan, Kebayoran Baru",
-          "DKI Jakarta, Jakarta Selatan, Kebayoran Lama",
-          "DKI Jakarta, Jakarta Selatan, Pesanggrahan",
-          "DKI Jakarta, Jakarta Selatan, Cilandak",
-          "DKI Jakarta, Jakarta Selatan, Pasar Minggu",
-          "DKI Jakarta, Jakarta Selatan, Jagakarsa",
-          "DKI Jakarta, Jakarta Selatan, Mampang Prapatan",
-          "DKI Jakarta, Jakarta Selatan, Pancoran",
-          "DKI Jakarta, Jakarta Selatan, Tebet",
-          "DKI Jakarta, Jakarta Selatan, Setiabudi",
-
-          "DKI Jakarta, Jakarta Timur, Matraman",
-          "DKI Jakarta, Jakarta Timur, Pulo Gadung",
-          "DKI Jakarta, Jakarta Timur, Jatinegara",
-          "DKI Jakarta, Jakarta Timur, Duren Sawit",
-          "DKI Jakarta, Jakarta Timur, Kramat Jati",
-          "DKI Jakarta, Jakarta Timur, Makasar",
-          "DKI Jakarta, Jakarta Timur, Pasar Rebo",
-          "DKI Jakarta, Jakarta Timur, Ciracas",
-          "DKI Jakarta, Jakarta Timur, Cipayung",
-          "DKI Jakarta, Jakarta Timur, Cakung",
-
-          "Jawa Barat, Kota Bandung, Bandung Wetan",
-          "Jawa Barat, Kota Bandung, Coblong",
-          "Jawa Barat, Kota Bandung, Sukajadi",
-          "Jawa Barat, Kota Bandung, Cicendo",
-          "Jawa Barat, Kota Bandung, Lengkong",
-          "Jawa Barat, Kota Bandung, Regol",
-          "Jawa Barat, Kota Bandung, Batununggal",
-          "Jawa Barat, Kota Bandung, Kiaracondong",
-
-          "Jawa Barat, Kota Bogor, Bogor Tengah",
-          "Jawa Barat, Kota Bogor, Bogor Utara",
-          "Jawa Barat, Kota Bogor, Bogor Selatan",
-          "Jawa Barat, Kota Bogor, Bogor Timur",
-          "Jawa Barat, Kota Bogor, Bogor Barat",
-          "Jawa Barat, Kota Bogor, Tanah Sareal",
-
-          "Jawa Barat, Kota Depok, Beji",
-          "Jawa Barat, Kota Depok, Cimanggis",
-          "Jawa Barat, Kota Depok, Pancoran Mas",
-          "Jawa Barat, Kota Depok, Sukmajaya",
-          "Jawa Barat, Kota Depok, Limo",
-          "Jawa Barat, Kota Depok, Sawangan",
-          "Jawa Barat, Kota Depok, Bojongsari",
-          "Jawa Barat, Kota Depok, Cilodong",
-          "Jawa Barat, Kota Depok, Cinere",
-          "Jawa Barat, Kota Depok, Cipayung",
-          "Jawa Barat, Kota Depok, Tapos",
-
-          "Jawa Tengah, Kota Semarang, Semarang Tengah",
-          "Jawa Tengah, Kota Semarang, Semarang Utara",
-          "Jawa Tengah, Kota Semarang, Semarang Timur",
-          "Jawa Tengah, Kota Semarang, Semarang Selatan",
-          "Jawa Tengah, Kota Semarang, Semarang Barat",
-          "Jawa Tengah, Kota Semarang, Candisari",
-          "Jawa Tengah, Kota Semarang, Gajahmungkur",
-          "Jawa Tengah, Kota Semarang, Tembalang",
-
-          "DI Yogyakarta, Kota Yogyakarta, Danurejan",
-          "DI Yogyakarta, Kota Yogyakarta, Gedongtengen",
-          "DI Yogyakarta, Kota Yogyakarta, Gondokusuman",
-          "DI Yogyakarta, Kota Yogyakarta, Gondomanan",
-          "DI Yogyakarta, Kota Yogyakarta, Jetis",
-          "DI Yogyakarta, Kota Yogyakarta, Kotagede",
-          "DI Yogyakarta, Kota Yogyakarta, Kraton",
-          "DI Yogyakarta, Kota Yogyakarta, Mantrijeron",
-          "DI Yogyakarta, Kota Yogyakarta, Mergangsan",
-          "DI Yogyakarta, Kota Yogyakarta, Ngampilan",
-          "DI Yogyakarta, Kota Yogyakarta, Pakualaman",
-          "DI Yogyakarta, Kota Yogyakarta, Tegalrejo",
-          "DI Yogyakarta, Kota Yogyakarta, Umbulharjo",
-          "DI Yogyakarta, Kota Yogyakarta, Wirobrajan",
-
-          "Jawa Timur, Kota Surabaya, Tegalsari",
-          "Jawa Timur, Kota Surabaya, Genteng",
-          "Jawa Timur, Kota Surabaya, Bubutan",
-          "Jawa Timur, Kota Surabaya, Simokerto",
-          "Jawa Timur, Kota Surabaya, Pabean Cantian",
-          "Jawa Timur, Kota Surabaya, Semampir",
-          "Jawa Timur, Kota Surabaya, Krembangan",
-          "Jawa Timur, Kota Surabaya, Kenjeran",
-          "Jawa Timur, Kota Surabaya, Tambaksari",
-          "Jawa Timur, Kota Surabaya, Gubeng",
-          "Jawa Timur, Kota Surabaya, Rungkut",
-
-          "Banten, Kota Tangerang, Tangerang",
-          "Banten, Kota Tangerang, Karawaci",
-          "Banten, Kota Tangerang, Cibodas",
-          "Banten, Kota Tangerang, Cipondoh",
-          "Banten, Kota Tangerang, Pinang",
-          "Banten, Kota Tangerang, Ciledug",
-          "Banten, Kota Tangerang, Larangan",
-
-          "Sumatera Barat, Kota Padang, Padang Barat",
-          "Sumatera Barat, Kota Padang, Padang Timur",
-          "Sumatera Barat, Kota Padang, Padang Selatan",
-          "Sumatera Barat, Kota Padang, Padang Utara",
-          "Sumatera Barat, Kota Padang, Koto Tangah",
-          "Sumatera Barat, Kota Padang, Kuranji",
-          "Sumatera Barat, Kota Padang, Pauh",
-          "Sumatera Barat, Kota Padang, Lubuk Kilangan",
-          "Sumatera Barat, Kota Padang, Lubuk Begalung",
-          "Sumatera Barat, Kota Padang, Bungus Teluk Kabung",
-          "Sumatera Barat, Kota Padang, Nanggalo",
-
-          "Sumatera Utara, Kota Medan, Medan Kota",
-          "Sumatera Utara, Kota Medan, Medan Barat",
-          "Sumatera Utara, Kota Medan, Medan Timur",
-          "Sumatera Utara, Kota Medan, Medan Utara",
-          "Sumatera Utara, Kota Medan, Medan Petisah",
-          "Sumatera Utara, Kota Medan, Medan Baru",
-          "Sumatera Utara, Kota Medan, Medan Johor",
-          "Sumatera Utara, Kota Medan, Medan Selayang",
-
-          "Riau, Kota Pekanbaru, Pekanbaru Kota",
-          "Riau, Kota Pekanbaru, Sail",
-          "Riau, Kota Pekanbaru, Sukajadi",
-          "Riau, Kota Pekanbaru, Senapelan",
-          "Riau, Kota Pekanbaru, Lima Puluh",
-          "Riau, Kota Pekanbaru, Rumbai",
-
-          "Bali, Kota Denpasar, Denpasar Barat",
-          "Bali, Kota Denpasar, Denpasar Timur",
-          "Bali, Kota Denpasar, Denpasar Selatan",
-          "Bali, Kota Denpasar, Denpasar Utara",
-
-          "Sulawesi Selatan, Kota Makassar, Makassar",
-          "Sulawesi Selatan, Kota Makassar, Ujung Pandang",
-          "Sulawesi Selatan, Kota Makassar, Rappocini",
-          "Sulawesi Selatan, Kota Makassar, Panakkukang",
-          "Sulawesi Selatan, Kota Makassar, Tamalate",
-          "Sulawesi Selatan, Kota Makassar, Biringkanaya",
-
-          "Kalimantan Timur, Kota Balikpapan, Balikpapan Kota",
-          "Kalimantan Timur, Kota Balikpapan, Balikpapan Utara",
-          "Kalimantan Timur, Kota Balikpapan, Balikpapan Selatan",
-          "Kalimantan Timur, Kota Balikpapan, Balikpapan Timur",
-          "Kalimantan Timur, Kota Balikpapan, Balikpapan Barat",
-
-          "Papua, Kota Jayapura, Jayapura Utara",
-          "Papua, Kota Jayapura, Jayapura Selatan",
-          "Papua, Kota Jayapura, Abepura",
-          "Papua, Kota Jayapura, Muara Tami",
-          "Papua, Kota Jayapura, Heram"
-        ];
-
-        function toggleHomeCityDropdown(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('home_city_dropdown');
-            const isHidden = dropdown.style.display === 'none';
-            
-            dropdown.style.display = isHidden ? 'block' : 'none';
-            
-            if (isHidden) {
-                const searchInput = document.getElementById('home_city_search_input');
-                searchInput.value = '';
-                searchInput.focus();
-                filterHomeCities('');
-            }
-        }
-
-        function filterHomeCities(query) {
-            const trimmed = query.trim().toLowerCase();
-            const listEl = document.getElementById('home_city_options_list');
-            listEl.innerHTML = '';
-
-            if (trimmed.length < 3) {
-                const msgLi = document.createElement('li');
-                msgLi.className = 'dropdown-message';
-                msgLi.innerText = 'Ketik 3 huruf';
-                listEl.appendChild(msgLi);
-                return;
-            }
-
-            const matches = wilayahIndonesia.filter(item => item.toLowerCase().includes(trimmed));
-
-            if (matches.length === 0) {
-                const msgLi = document.createElement('li');
-                msgLi.className = 'dropdown-message';
-                msgLi.innerText = 'Tidak ditemukan';
-                listEl.appendChild(msgLi);
-                return;
-            }
-
-            matches.forEach(cityStr => {
-                const li = document.createElement('li');
-                li.innerText = cityStr;
-                li.style.padding = '8px 12px';
-                li.style.cursor = 'pointer';
-                li.onclick = function(e) {
-                    e.stopPropagation();
-                    selectHomeCity(cityStr);
-                };
-                listEl.appendChild(li);
-            });
-        }
-
-        function selectHomeCity(val) {
-            document.getElementById('home_city').value = val;
-            const textSpan = document.getElementById('home_city_selected_text');
-            textSpan.innerText = val;
-            textSpan.style.color = '#333';
-            document.getElementById('home_city_dropdown').style.display = 'none';
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('home_city_dropdown');
-            const trigger = document.getElementById('home_city_trigger');
-            if (dropdown && trigger && !dropdown.contains(event.target) && !trigger.contains(event.target)) {
-                dropdown.style.display = 'none';
-            }
+        // --- Cek Ongkir Feature with Dependent Dropdowns ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load provinces on page load
+            loadProvinces();
         });
 
-        function checkShippingRates() {
-            const destination = document.getElementById('home_city').value;
-            const courier = document.getElementById('home_courier').value;
-            const weight = document.getElementById('home_weight').value;
+        function loadProvinces() {
+            const provSelect = document.getElementById('home_province');
+            provSelect.innerHTML = '<option value="">Memuat Provinsi...</option>';
+            
+            fetch('/shipping/regions/provinces')
+                .then(res => res.json())
+                .then(data => {
+                    provSelect.innerHTML = '<option value="">Pilih Provinsi</option>';
+                    data.forEach(prov => {
+                        const opt = document.createElement('option');
+                        opt.value = prov.id;
+                        opt.textContent = prov.name;
+                        provSelect.appendChild(opt);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    provSelect.innerHTML = '<option value="">Gagal memuat Provinsi</option>';
+                });
+        }
 
-            if (!destination) {
-                alert('Silakan pilih kota/kabupaten tujuan terlebih dahulu.');
+        function onProvinceChange() {
+            const provId = document.getElementById('home_province').value;
+            const citySelect = document.getElementById('home_city_kab');
+            const distSelect = document.getElementById('home_district');
+            
+            // Reset and disable subsequent dropdowns
+            citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+            citySelect.disabled = true;
+            distSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+            distSelect.disabled = true;
+            
+            if (!provId) return;
+
+            citySelect.innerHTML = '<option value="">Memuat...</option>';
+            citySelect.disabled = false;
+
+            fetch(`/shipping/regions/regencies?province_id=${provId}`)
+                .then(res => res.json())
+                .then(data => {
+                    citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+                    data.forEach(city => {
+                        const opt = document.createElement('option');
+                        opt.value = city.id;
+                        opt.textContent = city.name;
+                        citySelect.appendChild(opt);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    citySelect.innerHTML = '<option value="">Gagal memuat</option>';
+                });
+        }
+
+        function onCityChange() {
+            const regencyId = document.getElementById('home_city_kab').value;
+            const distSelect = document.getElementById('home_district');
+            
+            // Reset and disable district select
+            distSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+            distSelect.disabled = true;
+            
+            if (!regencyId) return;
+
+            distSelect.innerHTML = '<option value="">Memuat...</option>';
+            distSelect.disabled = false;
+
+            fetch(`/shipping/regions/districts?regency_id=${regencyId}`)
+                .then(res => res.json())
+                .then(data => {
+                    distSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+                    data.forEach(dist => {
+                        const opt = document.createElement('option');
+                        opt.value = dist.id;
+                        opt.textContent = dist.name;
+                        distSelect.appendChild(opt);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    distSelect.innerHTML = '<option value="">Gagal memuat</option>';
+                });
+        }
+
+        function checkShippingRates() {
+            const provSelect = document.getElementById('home_province');
+            const citySelect = document.getElementById('home_city_kab');
+            const distSelect = document.getElementById('home_district');
+            const weightInput = document.getElementById('home_weight');
+
+            const provText = provSelect.options[provSelect.selectedIndex]?.text;
+            const cityText = citySelect.options[citySelect.selectedIndex]?.text;
+            const distText = distSelect.options[distSelect.selectedIndex]?.text;
+            const weightKg = parseFloat(weightInput.value);
+
+            if (!provSelect.value || !citySelect.value || !distSelect.value) {
+                alert('Silakan pilih Provinsi, Kota/Kabupaten, dan Kecamatan tujuan terlebih dahulu.');
                 return;
             }
 
-            if (!weight || weight <= 0) {
+            if (isNaN(weightKg) || weightKg <= 0) {
                 alert('Silakan masukkan berat barang yang valid.');
                 return;
             }
 
-            // Show loading
-            const resultsBody = document.getElementById('home_shipping_results_body');
-            resultsBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #666;"><i class="fas fa-spinner fa-spin"></i> Menghitung ongkos kirim...</td></tr>';
+            // Concatenate destination for backend format: "Province, City, District"
+            const destination = `${provText}, ${cityText}, ${distText}`;
+            // Convert kg to grams for backend calculation
+            const weightGrams = Math.round(weightKg * 1000);
+
+            // Hide placeholder and show loading inside table
+            document.getElementById('results_placeholder').style.display = 'none';
             document.getElementById('home_shipping_results').style.display = 'block';
+            
+            // Set header text (e.g. "Jakarta Pusat (1 kg)")
+            document.getElementById('results_header_location').textContent = `${cityText} (${weightKg} kg)`;
+
+            const resultsBody = document.getElementById('home_shipping_results_body');
+            resultsBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Menghitung ongkos kirim...</td></tr>';
 
             fetch('/shipping/calculate', {
                 method: 'POST',
@@ -579,7 +547,7 @@
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: 'destination=' + encodeURIComponent(destination) + '&weight=' + weight
+                body: `destination=${encodeURIComponent(destination)}&weight=${weightGrams}`
             })
             .then(res => res.json())
             .then(data => {
@@ -589,21 +557,17 @@
                     
                     let count = 0;
                     for (const key in data.rates) {
-                        if (courier !== 'all' && key !== courier) continue;
-                        
                         const cr = data.rates[key];
                         for (const srvKey in cr.services) {
                             const srv = cr.services[srvKey];
                             const row = document.createElement('tr');
-                            row.style.borderBottom = '1px solid #eaeaea';
+                            row.style.borderBottom = '1px solid #e2e8f0';
+                            
                             row.innerHTML = `
-                                <td style="padding: 15px; display: flex; align-items: center; gap: 8px;">
-                                    <img src="${cr.logo}" alt="${cr.name}" style="max-height: 20px; max-width: 60px; object-fit: contain;">
-                                    <span style="font-weight: 500;">${cr.name}</span>
-                                </td>
-                                <td style="padding: 15px; color: #333; font-style: italic; font-weight: 600;">${srv.name}</td>
-                                <td style="padding: 15px; font-weight: 600; color: #000;">Rp ${formatter.format(srv.cost)}</td>
-                                <td style="padding: 15px; color: #666;">${srv.etd}</td>
+                                <td style="padding: 12px; font-weight: 600; color: #0f172a;">${cr.name}</td>
+                                <td style="padding: 12px; color: #334155;">${srv.name}</td>
+                                <td style="padding: 12px; font-weight: 500; color: #0f172a; text-align: right; padding-right: 25px;">Rp ${formatter.format(srv.cost)}</td>
+                                <td style="padding: 12px; color: #475569;">${srv.etd}</td>
                             `;
                             resultsBody.appendChild(row);
                             count++;
@@ -611,25 +575,33 @@
                     }
 
                     if (count === 0) {
-                        resultsBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #999;">Tidak ada layanan pengiriman yang cocok.</td></tr>';
+                        resultsBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #94a3b8;">Tidak ada layanan pengiriman yang tersedia.</td></tr>';
                     }
                 } else {
-                    resultsBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: #e74c3c;">Error: ${data.message}</td></tr>`;
+                    resultsBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: #ef4444;">Error: ${data.message}</td></tr>`;
                 }
             })
             .catch(err => {
                 console.error(err);
-                resultsBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #e74c3c;">Gagal menghubungi server. Silakan coba lagi.</td></tr>';
+                resultsBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #ef4444;">Gagal menghubungi server. Silakan coba lagi.</td></tr>';
             });
         }
 
         function resetShippingForm() {
-            document.getElementById('home_city').value = '';
-            document.getElementById('home_city_selected_text').innerText = 'Pilih Kota/Kabupaten';
-            document.getElementById('home_city_selected_text').style.color = '#999';
-            document.getElementById('home_courier').value = 'all';
-            document.getElementById('home_weight').value = '1000';
+            document.getElementById('home_province').value = '';
+            
+            const citySelect = document.getElementById('home_city_kab');
+            citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+            citySelect.disabled = true;
+            
+            const distSelect = document.getElementById('home_district');
+            distSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+            distSelect.disabled = true;
+            
+            document.getElementById('home_weight').value = '1';
+            
             document.getElementById('home_shipping_results').style.display = 'none';
+            document.getElementById('results_placeholder').style.display = 'block';
             document.getElementById('home_shipping_results_body').innerHTML = '';
         }
     </script>
