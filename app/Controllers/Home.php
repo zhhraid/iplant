@@ -931,86 +931,231 @@ class Home extends BaseController
 
     private function calculateRates(string $destination, int $weightGrams): array
     {
-        // 1. Parse province from destination.
-        // Destination format: "Province, City, District"
+        // Origin toko berada di Jawa Tengah. Tarif dan estimasi di bawah ini
+        // adalah simulasi lokal yang dibuat per zona tujuan, bukan API ekspedisi live.
         $parts = explode(',', $destination);
-        $province = trim($parts[0]);
+        $province = trim($parts[0] ?? '');
+        $city = trim($parts[1] ?? '');
+        $zone = $this->getShippingZoneFromCentralJava($province, $city);
 
-        // 2. Base rate per kg depending on province
-        $baseRate = 25000; // default
-        
-        $provinceLower = strtolower($province);
-        if (strpos($provinceLower, 'sulawesi selatan') !== false) {
-            $baseRate = 10000;
-        } elseif (strpos($provinceLower, 'dki jakarta') !== false) {
-            $baseRate = 17000;
-        } elseif (strpos($provinceLower, 'banten') !== false || strpos($provinceLower, 'jawa barat') !== false) {
-            $baseRate = 20000;
-        } elseif (strpos($provinceLower, 'jawa tengah') !== false || strpos($provinceLower, 'di yogyakarta') !== false || strpos($provinceLower, 'yogyakarta') !== false || strpos($provinceLower, 'jawa timur') !== false) {
-            $baseRate = 22000;
-        } elseif (strpos($provinceLower, 'bali') !== false) {
-            $baseRate = 25000;
-        } elseif (strpos($provinceLower, 'sumatera') !== false || strpos($provinceLower, 'riau') !== false) {
-            $baseRate = 30000;
-        } elseif (strpos($provinceLower, 'kalimantan timur') !== false || strpos($provinceLower, 'kalimantan') !== false) {
-            $baseRate = 28000;
-        } elseif (strpos($provinceLower, 'papua') !== false) {
-            $baseRate = 45000;
-        }
-
-        // 3. Calculate chargeable weight (ceil to nearest kg, minimum 1kg)
         $weightKg = $weightGrams / 1000.0;
         $chargeableWeight = (int) max(1, ceil($weightKg));
+        $baseRate = (int) $zone['base_rate'];
+        $extraKgRate = (int) $zone['extra_kg_rate'];
+        $baseCost = $baseRate + (($chargeableWeight - 1) * $extraKgRate);
 
-        // 4. Calculate prices for each courier and service
-        $jne_reg = $baseRate * $chargeableWeight;
-        $jne_yes = ($baseRate + 30000) * $chargeableWeight;
-        $jne_jtr = 80000; // Flat Rp 80.000
+        $roundToThousand = static function (float $amount): int {
+            return (int) (ceil($amount / 1000) * 1000);
+        };
 
-        $jnt_reg = (int) (round(($baseRate * 0.9 * $chargeableWeight) / 1000) * 1000);
-        $tiki_reg = (int) (round(($baseRate * 0.95 * $chargeableWeight) / 1000) * 1000);
-        $lion_reg = (int) (round(($baseRate * 0.85 * $chargeableWeight) / 1000) * 1000);
-        $pos_kilat = (int) (round(($baseRate * 0.8 * $chargeableWeight) / 1000) * 1000);
+        $jneReg = $roundToThousand($baseCost);
+        $jneYes = $roundToThousand($baseCost + $zone['express_surcharge']);
+        $jneJtr = $roundToThousand(max($zone['cargo_minimum'], $baseCost * 2.3));
+        $jntReg = $roundToThousand($baseCost * 0.95);
+        $tikiReg = $roundToThousand($baseCost * 0.98);
+        $posKilat = $roundToThousand($baseCost * 0.9);
+        $lionReg = $roundToThousand($baseCost * 0.88);
 
         return [
             'jne' => [
                 'name' => 'JNE',
                 'logo' => '/images/expeditions/jne.png',
                 'services' => [
-                    'REG' => ['name' => 'REG', 'cost' => $jne_reg, 'etd' => '1-2 hari'],
-                    'YES' => ['name' => 'YES', 'cost' => $jne_yes, 'etd' => '1-1 hari'],
-                    'JTR' => ['name' => 'JTR', 'cost' => $jne_jtr, 'etd' => '5-6 hari']
+                    'REG' => ['name' => 'REG', 'cost' => $jneReg, 'etd' => $zone['etd']['regular']],
+                    'YES' => ['name' => 'YES', 'cost' => $jneYes, 'etd' => $zone['etd']['express']],
+                    'JTR' => ['name' => 'JTR', 'cost' => $jneJtr, 'etd' => $zone['etd']['cargo']]
                 ]
             ],
             'jnt' => [
                 'name' => 'J&T',
                 'logo' => '/images/expeditions/jnt.png',
                 'services' => [
-                    'Reguler' => ['name' => 'Reguler', 'cost' => $jnt_reg, 'etd' => '? hari']
+                    'Reguler' => ['name' => 'Reguler', 'cost' => $jntReg, 'etd' => $zone['etd']['regular']]
                 ]
             ],
             'tiki' => [
                 'name' => 'TIKI',
                 'logo' => '/images/expeditions/tiki.png',
                 'services' => [
-                    'Reguler' => ['name' => 'Reguler', 'cost' => $tiki_reg, 'etd' => '2 day hari']
+                    'Reguler' => ['name' => 'Reguler', 'cost' => $tikiReg, 'etd' => $zone['etd']['regular']]
                 ]
             ],
             'pos' => [
                 'name' => 'POS',
                 'logo' => '/images/expeditions/pos.png',
                 'services' => [
-                    'Kilat' => ['name' => 'Kilat', 'cost' => $pos_kilat, 'etd' => '3 day hari']
+                    'Kilat' => ['name' => 'Kilat', 'cost' => $posKilat, 'etd' => $zone['etd']['economy']]
                 ]
             ],
             'lion' => [
                 'name' => 'LION',
                 'logo' => '/images/expeditions/lion.png',
                 'services' => [
-                    'Regpack' => ['name' => 'Regpack', 'cost' => $lion_reg, 'etd' => '2-4 day hari']
+                    'Regpack' => ['name' => 'Regpack', 'cost' => $lionReg, 'etd' => $zone['etd']['regular']]
                 ]
             ]
         ];
+    }
+
+    private function getShippingZoneFromCentralJava(string $province, string $city = ''): array
+    {
+        $provinceLower = strtolower($province);
+        $cityLower = strtolower($city);
+
+        $zones = [
+            'same_province' => [
+                'base_rate' => 9000,
+                'extra_kg_rate' => 5000,
+                'express_surcharge' => 12000,
+                'cargo_minimum' => 35000,
+                'etd' => [
+                    'express' => '1 hari',
+                    'regular' => '1-2 hari',
+                    'economy' => '2-3 hari',
+                    'cargo' => '2-4 hari',
+                ],
+            ],
+            'near_java' => [
+                'base_rate' => 12000,
+                'extra_kg_rate' => 7000,
+                'express_surcharge' => 15000,
+                'cargo_minimum' => 45000,
+                'etd' => [
+                    'express' => '1-2 hari',
+                    'regular' => '2-3 hari',
+                    'economy' => '3-4 hari',
+                    'cargo' => '3-5 hari',
+                ],
+            ],
+            'west_java_jakarta_banten' => [
+                'base_rate' => 16000,
+                'extra_kg_rate' => 9000,
+                'express_surcharge' => 18000,
+                'cargo_minimum' => 55000,
+                'etd' => [
+                    'express' => '1-2 hari',
+                    'regular' => '2-4 hari',
+                    'economy' => '3-5 hari',
+                    'cargo' => '4-6 hari',
+                ],
+            ],
+            'bali_nusa' => [
+                'base_rate' => 24000,
+                'extra_kg_rate' => 14000,
+                'express_surcharge' => 25000,
+                'cargo_minimum' => 70000,
+                'etd' => [
+                    'express' => '2-3 hari',
+                    'regular' => '3-5 hari',
+                    'economy' => '4-7 hari',
+                    'cargo' => '5-8 hari',
+                ],
+            ],
+            'sumatra' => [
+                'base_rate' => 26000,
+                'extra_kg_rate' => 15000,
+                'express_surcharge' => 28000,
+                'cargo_minimum' => 75000,
+                'etd' => [
+                    'express' => '2-4 hari',
+                    'regular' => '3-6 hari',
+                    'economy' => '5-8 hari',
+                    'cargo' => '6-9 hari',
+                ],
+            ],
+            'kalimantan' => [
+                'base_rate' => 30000,
+                'extra_kg_rate' => 17000,
+                'express_surcharge' => 32000,
+                'cargo_minimum' => 85000,
+                'etd' => [
+                    'express' => '3-5 hari',
+                    'regular' => '4-7 hari',
+                    'economy' => '6-9 hari',
+                    'cargo' => '7-10 hari',
+                ],
+            ],
+            'sulawesi' => [
+                'base_rate' => 32000,
+                'extra_kg_rate' => 18000,
+                'express_surcharge' => 34000,
+                'cargo_minimum' => 90000,
+                'etd' => [
+                    'express' => '3-5 hari',
+                    'regular' => '4-8 hari',
+                    'economy' => '6-10 hari',
+                    'cargo' => '8-12 hari',
+                ],
+            ],
+            'maluku' => [
+                'base_rate' => 42000,
+                'extra_kg_rate' => 25000,
+                'express_surcharge' => 45000,
+                'cargo_minimum' => 120000,
+                'etd' => [
+                    'express' => '5-7 hari',
+                    'regular' => '7-11 hari',
+                    'economy' => '9-14 hari',
+                    'cargo' => '10-16 hari',
+                ],
+            ],
+            'papua' => [
+                'base_rate' => 55000,
+                'extra_kg_rate' => 34000,
+                'express_surcharge' => 60000,
+                'cargo_minimum' => 160000,
+                'etd' => [
+                    'express' => '6-9 hari',
+                    'regular' => '8-14 hari',
+                    'economy' => '11-18 hari',
+                    'cargo' => '14-21 hari',
+                ],
+            ],
+        ];
+
+        if (strpos($provinceLower, 'jawa tengah') !== false) {
+            $zone = $zones['same_province'];
+            if (strpos($cityLower, 'kota semarang') !== false || strpos($cityLower, 'kabupaten semarang') !== false) {
+                $zone['base_rate'] = 8000;
+                $zone['etd']['regular'] = '1 hari';
+                $zone['etd']['economy'] = '1-2 hari';
+            }
+            return $zone;
+        }
+
+        if (strpos($provinceLower, 'di yogyakarta') !== false || strpos($provinceLower, 'yogyakarta') !== false || strpos($provinceLower, 'jawa timur') !== false) {
+            return $zones['near_java'];
+        }
+
+        if (strpos($provinceLower, 'jawa barat') !== false || strpos($provinceLower, 'dki jakarta') !== false || strpos($provinceLower, 'banten') !== false) {
+            return $zones['west_java_jakarta_banten'];
+        }
+
+        if (strpos($provinceLower, 'bali') !== false || strpos($provinceLower, 'nusa tenggara') !== false) {
+            return $zones['bali_nusa'];
+        }
+
+        if (strpos($provinceLower, 'sumatera') !== false || strpos($provinceLower, 'aceh') !== false || strpos($provinceLower, 'riau') !== false || strpos($provinceLower, 'jambi') !== false || strpos($provinceLower, 'bengkulu') !== false || strpos($provinceLower, 'lampung') !== false || strpos($provinceLower, 'bangka') !== false) {
+            return $zones['sumatra'];
+        }
+
+        if (strpos($provinceLower, 'kalimantan') !== false) {
+            return $zones['kalimantan'];
+        }
+
+        if (strpos($provinceLower, 'sulawesi') !== false || strpos($provinceLower, 'gorontalo') !== false) {
+            return $zones['sulawesi'];
+        }
+
+        if (strpos($provinceLower, 'maluku') !== false) {
+            return $zones['maluku'];
+        }
+
+        if (strpos($provinceLower, 'papua') !== false) {
+            return $zones['papua'];
+        }
+
+        return $zones['sumatra'];
     }
 
     public function calculateShippingRates()

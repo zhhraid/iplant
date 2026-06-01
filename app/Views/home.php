@@ -23,9 +23,17 @@
             font-size: 2.2rem;
             font-weight: 700;
             color: #0f172a;
-            margin-bottom: 45px;
+            margin-bottom: 10px;
             font-family: 'Inter', sans-serif;
             letter-spacing: -0.5px;
+        }
+        .shipping-origin-note {
+            max-width: 640px;
+            margin: 0 auto 42px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
         .shipping-grid-container {
             display: grid;
@@ -285,6 +293,7 @@
     <section class="shipping-section">
         <div class="container">
             <h2 class="shipping-title">Cek Ongkos Kirim</h2>
+            <p class="shipping-origin-note">Pengiriman dari Jawa Tengah. Estimasi menyesuaikan provinsi, kota/kabupaten, kecamatan tujuan, dan berat paket.</p>
             
             <div class="shipping-grid-container">
                 <!-- Left Column: Form -->
@@ -326,7 +335,7 @@
                     <!-- Displayed dynamically, initially showing placeholder or empty state -->
                     <div id="results_placeholder" style="text-align: center; padding: 50px 20px; color: #94a3b8; border: 1px dashed #cbd5e1; border-radius: 8px;">
                         <i class="fas fa-truck" style="font-size: 3rem; margin-bottom: 15px; color: #cbd5e1;"></i>
-                        <p style="margin: 0; font-size: 0.95rem;">Masukkan tujuan dan berat barang, lalu klik "Cek Ongkir" untuk melihat daftar tarif pengiriman.</p>
+                        <p style="margin: 0; font-size: 0.95rem;">Masukkan tujuan dan berat barang, lalu klik "Cek Ongkir" untuk melihat daftar tarif dan estimasi dari Jawa Tengah.</p>
                     </div>
                     
                     <div id="home_shipping_results" style="display: none;">
@@ -536,7 +545,7 @@
             document.getElementById('home_shipping_results').style.display = 'block';
             
             // Set header text (e.g. "Jakarta Pusat (1 kg)")
-            document.getElementById('results_header_location').textContent = `${cityText} (${weightKg} kg)`;
+            document.getElementById('results_header_location').textContent = `Jawa Tengah ke ${cityText} (${weightKg} kg)`;
 
             const resultsBody = document.getElementById('home_shipping_results_body');
             resultsBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Menghitung ongkos kirim...</td></tr>';
