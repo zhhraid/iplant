@@ -622,6 +622,43 @@ class Home extends BaseController
         return redirect()->to('/invoice/' . $orderId);
     }
 
+    public function confirmPaymentIndex()
+    {
+        $orderModel = new OrderModel();
+        $user = $this->session->get('user');
+
+        $builder = $orderModel
+            ->groupStart()
+                ->where('status', 'Belum Dibayar')
+                ->orWhere('status', 'pending')
+                ->orWhere('status', '')
+                ->orWhere('status IS NULL', null, false)
+            ->groupEnd();
+
+        if (!empty($user['email'])) {
+            $builder->where('customer_email', $user['email']);
+        }
+
+        $order = $builder->orderBy('id', 'DESC')->first();
+
+        if (!$order && !empty($user['email'])) {
+            $order = $orderModel
+                ->where('customer_email', $user['email'])
+                ->orderBy('id', 'DESC')
+                ->first();
+        }
+
+        if (!$order) {
+            $order = $orderModel->orderBy('id', 'DESC')->first();
+        }
+
+        if (!$order) {
+            return redirect()->to('/');
+        }
+
+        return redirect()->to('/invoice/' . $order['id'] . '/confirm-payment');
+    }
+
     public function confirmPayment($orderId = null)
     {
         if (!$orderId) return redirect()->to('/');

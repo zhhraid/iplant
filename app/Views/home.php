@@ -274,7 +274,15 @@
                     </div>
                     
                     <div class="product-actions">
-                        <button class="btn-share"><i class="fas fa-share"></i> Bagikan</button>
+                        <button
+                            class="btn-share"
+                            type="button"
+                            data-product-name="<?= esc($p['name']) ?>"
+                            data-product-url="https://iplant.id/product-detail/<?= $p['id'] ?>"
+                            onclick="openShareModal(this)"
+                        >
+                            <i class="fas fa-share"></i> Bagikan
+                        </button>
                         <button class="btn-detail" onclick="window.location.href='/product-detail/<?= $p['id'] ?>'">Lihat Detil</button>
                     </div>
                 </div>
@@ -359,49 +367,89 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container footer-container">
-            <div class="footer-col">
-                <h4>iplant.id</h4>
+    <div class="share-modal-overlay" id="shareModal" aria-hidden="true">
+        <div class="share-modal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+            <h3 id="shareModalTitle">Bagikan</h3>
+            <div class="share-buttons">
+                <a class="share-btn instagram" href="https://www.instagram.com/iplant_shop" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a class="share-btn tiktok" href="https://www.tiktok.com/@iplant.id" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                <a class="share-btn youtube" href="https://www.youtube.com/@iPlantIndonesia" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <a class="share-btn facebook" href="https://web.facebook.com/iplant.id?_rdc=1&amp;_rdr#" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a class="share-btn linkedin" id="shareLinkedin" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://iplant.id/product/iplant-care-sprayer-anti-hama" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a class="share-btn whatsapp" id="shareWhatsapp" href="https://api.whatsapp.com/send?text=iPlant%20Care%20-%20Sprayer%20Anti%20Hama%0A%0Ahttps%3A%2F%2Fiplant.id%2Fproduct%2Fiplant-care-sprayer-anti-hama" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                <a class="share-btn telegram" id="shareTelegram" href="https://t.me/share/url?url=https://iplant.id/product/iplant-care-sprayer-anti-hama" target="_blank" rel="noopener" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+            </div>
+            <button type="button" class="share-close-btn" onclick="closeShareModal()">Kembali</button>
+        </div>
+    </div>
+
+    <!-- Black Footer -->
+    <footer class="footer-black">
+        <div class="container footer-black-container">
+            <div class="footer-black-col">
+                <h4>Links</h4>
                 <ul>
-                    <li><a href="#">Kategori</a></li>
-                    <li><a href="#">Blog</a></li>
-                    <li><a href="#">Tentang Kami</a></li>
-                    <li><a href="#">Kontak</a></li>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                    <li><a href="/category/bambu-hoki">Daftar Produk</a></li>
+                    <li><a href="/confirm-payment">Konfirmasi Pembayaran</a></li>
                 </ul>
             </div>
-            <div class="footer-col">
-                <h4>Sosial Media</h4>
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
+            <div class="footer-black-col">
+                <h4>Social Media</h4>
+                <div class="social-icons-black">
+                    <a href="https://www.instagram.com/iplant_shop" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.tiktok.com/@iplant.id" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.youtube.com/@iPlantIndonesia" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://web.facebook.com/iplant.id?_rdc=1&amp;_rdr#" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                 </div>
             </div>
-            <div class="footer-col">
+            <div class="footer-black-col">
                 <h4>Hubungi Kami</h4>
-                <ul class="contact-info">
-                    <li><i class="fas fa-map-marker-alt"></i> Jl. Pertanian No. 1, Makassar</li>
-                    <li><i class="fas fa-envelope"></i> info@iplant.id</li>
-                    <li><i class="fas fa-phone"></i> +62 812 3456 7890</li>
+                <ul class="contact-info-black">
+                    <li><i class="fab fa-whatsapp"></i> 0831-6500-7109</li>
+                    <li><i class="far fa-envelope"></i> iplant.indonesia@gmail.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> JL Cemara Kipas No 31<br>Sidomulyo, Kota Batu.<br>Jawa Timur.</li>
                 </ul>
             </div>
-            <div class="footer-col newsletter-col">
-                <h4>Berlangganan Newsletter</h4>
-                <div class="newsletter-form">
-                    <input type="email" placeholder="Email Anda...">
-                    <button class="btn btn-primary">Kirim</button>
+            <div class="footer-black-col newsletter-black-col">
+                <h4>Berita Newsletter</h4>
+                <div class="newsletter-form-black">
+                    <input type="email" placeholder="Masukan email di sini">
+                    <button class="btn-subscribe">Berlangganan</button>
                 </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 iplant.id - Hak Cipta Dilindungi.</p>
+        <div class="footer-black-bottom">
+            <p>@2026 iPlant Inc.</p>
         </div>
     </footer>
 
     <script>
+        function openShareModal() {
+            const modal = document.getElementById('shareModal');
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeShareModal() {
+            const modal = document.getElementById('shareModal');
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        document.getElementById('shareModal')?.addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeShareModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeShareModal();
+            }
+        });
+
         document.querySelector('.btn-load-more')?.addEventListener('click', function() {
             const hiddenProducts = document.querySelectorAll('.product-card.hidden-product');
             let count = 0;

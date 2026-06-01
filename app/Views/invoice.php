@@ -580,7 +580,7 @@
         <!-- Simulation Helper Control Panel for Testing / Lecturer Demo -->
         <div class="simulation-helper-box" style="background-color: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 6px; padding: 16px 20px; margin-bottom: 30px; font-size: 0.92rem; color: #334155; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <div style="font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: #1e293b;">
-                <span style="font-size: 1.15rem;">⚙️</span>
+                <span style="font-size: 1.15rem;">Ã¢Å¡â„¢Ã¯Â¸Â</span>
                 <span>Panel Simulasi Integrasi API Pelacakan Kurir (Mock API)</span>
             </div>
             <div style="margin-bottom: 12px; color: #64748b; line-height: 1.55;">
@@ -604,7 +604,7 @@
                     </a>
                 <?php else: ?>
                     <span style="font-weight: 600; color: #16a34a; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-                        ✅ Status: Transaksi Selesai & Paket Telah Diterima.
+                        Ã¢Å“â€¦ Status: Transaksi Selesai & Paket Telah Diterima.
                     </span>
                 <?php endif; ?>
             </div>
@@ -792,17 +792,17 @@
                 <ul>
                     <li><a href="/">Home</a></li>
                     <li><a href="/blog">Blog</a></li>
-                    <li><a href="#">Daftar Produk</a></li>
-                    <li><a href="#">Konfirmasi Pembayaran</a></li>
+                    <li><a href="/category/bambu-hoki">Daftar Produk</a></li>
+                    <li><a href="/confirm-payment">Konfirmasi Pembayaran</a></li>
                 </ul>
             </div>
             <div class="footer-black-col">
                 <h4>Social Media</h4>
                 <div class="social-icons-black">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-tiktok"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/iplant_shop" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.tiktok.com/@iplant.id" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.youtube.com/@iPlantIndonesia" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://web.facebook.com/iplant.id?_rdc=1&amp;_rdr#" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                 </div>
             </div>
             <div class="footer-black-col">

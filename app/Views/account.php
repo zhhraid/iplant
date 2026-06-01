@@ -380,17 +380,17 @@
                 <ul>
                     <li><a href="/">Home</a></li>
                     <li><a href="/blog">Blog</a></li>
-                    <li><a href="#">Daftar Produk</a></li>
-                    <li><a href="#">Konfirmasi Pembayaran</a></li>
+                    <li><a href="/category/bambu-hoki">Daftar Produk</a></li>
+                    <li><a href="/confirm-payment">Konfirmasi Pembayaran</a></li>
                 </ul>
             </div>
             <div class="footer-black-col">
                 <h4>Social Media</h4>
                 <div class="social-icons-black">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-tiktok"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/iplant_shop" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.tiktok.com/@iplant.id" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.youtube.com/@iPlantIndonesia" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://web.facebook.com/iplant.id?_rdc=1&amp;_rdr#" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                 </div>
             </div>
             <div class="footer-black-col">

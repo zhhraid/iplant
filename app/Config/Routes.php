@@ -20,6 +20,7 @@ $routes->get('/blog-detail', 'Home::blogDetail');
 $routes->get('/product-detail', 'Home::productDetail');
 $routes->get('/product-detail/(:num)', 'Home::productDetail/$1');
 $routes->get('/cart', 'Home::cart');
+$routes->get('/confirm-payment', 'Home::confirmPaymentIndex');
 
 // Cart Actions (AJAX)
 $routes->post('/cart/add', 'Home::addToCart');
