@@ -67,12 +67,23 @@ ul {
 /* Mega Menu Styles */
 .dropdown-kategori {
     position: static;
+    padding: 28px 0;
+    margin: -28px 0;
+}
+
+.dropdown-kategori::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 16px;
 }
 
 .mega-menu {
     display: none;
     position: absolute;
-    top: 80px; /* Right below the header */
+    top: calc(100% + 8px);
     left: 15px; /* align with container padding */
     right: 15px;
     background-color: var(--white);
@@ -85,7 +96,8 @@ ul {
     border-radius: 0 0 8px 8px;
 }
 
-.dropdown-kategori:hover .mega-menu {
+.dropdown-kategori:hover .mega-menu,
+.dropdown-kategori:focus-within .mega-menu {
     display: grid;
 }
 
