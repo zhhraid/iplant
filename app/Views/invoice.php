@@ -499,7 +499,7 @@
         1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
         7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
     ];
-    $orderTime = new DateTime($order['created_at'], new DateTimeZone(app_timezone()));
+    $orderTime = new DateTime($order['tanggal_pesanan'], new DateTimeZone(app_timezone()));
     $m = (int) $orderTime->format('n');
     $monthName = $months[$m] ?? $orderTime->format('F');
     $formattedDate = $orderTime->format('j') . ' ' . $monthName . ' ' . $orderTime->format('Y') . ' pukul ' . $orderTime->format('g:i a');

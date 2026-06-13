@@ -8,8 +8,16 @@ class ProductsSeeder extends Seeder
 {
     public function run()
     {
-        // Truncate table first to prevent duplicate entries on seed
-        $this->db->table('products')->truncate();
+        $this->db->disableForeignKeyChecks();
+        $this->db->table('blog')->truncate();
+        $this->db->table('metode_pembayaran')->truncate();
+        $this->db->table('metode_pengiriman')->truncate();
+        $this->db->table('ekspedisi')->truncate();
+        $this->db->table('kupon')->truncate();
+        $this->db->table('produk')->truncate();
+        $this->db->table('sub_kategori')->truncate();
+        $this->db->table('kategori')->truncate();
+        $this->db->enableForeignKeyChecks();
 
         $data = [
             // =========================================================================
@@ -393,7 +401,156 @@ class ProductsSeeder extends Seeder
             ],
         ];
 
-        // Insert products in batch
-        $this->db->table('products')->insertBatch($data);
+        $subCategoryIds = $this->seedCategories($data);
+        $products = [];
+
+        foreach ($data as $product) {
+            $subCategory = $product['subcategory'];
+            $products[] = [
+                'id_sub_kategori' => $subCategoryIds[$subCategory],
+                'nama_produk' => $product['name'],
+                'harga' => $product['price'],
+                'harga_lama' => $product['old_price'],
+                'gambar_produk' => $product['image_url'],
+                'stok' => $product['stock'],
+                'deskripsi_produk' => $product['description'],
+            ];
+        }
+
+        $this->db->table('produk')->insertBatch($products);
+        $this->seedCoupons();
+        $this->seedShippingMethods();
+        $this->seedPaymentMethods();
+        $this->seedBlogs();
+    }
+
+    private function seedCategories(array $products): array
+    {
+        $categoryIds = [];
+        $subCategoryIds = [];
+
+        foreach ($products as $product) {
+            $categoryName = $product['category'];
+            $subCategoryName = $product['subcategory'];
+
+            if (!isset($categoryIds[$categoryName])) {
+                $this->db->table('kategori')->insert([
+                    'kategori' => $categoryName,
+                    'slug' => $this->slugify($categoryName),
+                ]);
+                $categoryIds[$categoryName] = $this->db->insertID();
+            }
+
+            if (!isset($subCategoryIds[$subCategoryName])) {
+                $this->db->table('sub_kategori')->insert([
+                    'id_kategori' => $categoryIds[$categoryName],
+                    'sub_kategori' => $subCategoryName,
+                    'slug' => $this->slugify($subCategoryName),
+                ]);
+                $subCategoryIds[$subCategoryName] = $this->db->insertID();
+            }
+        }
+
+        return $subCategoryIds;
+    }
+
+    private function slugify(string $value): string
+    {
+        $slug = strtolower(trim($value));
+        $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?? $slug;
+
+        return trim($slug, '-');
+    }
+
+    private function seedCoupons(): void
+    {
+        $this->db->table('kupon')->insertBatch([
+            [
+                'kode_kupon' => 'IPLANT10',
+                'tipe_diskon' => 'nominal',
+                'jumlah_diskon' => 10000,
+                'minimum_pesanan' => 100000,
+                'status' => 1,
+            ],
+            [
+                'kode_kupon' => 'TANAMAN20',
+                'tipe_diskon' => 'nominal',
+                'jumlah_diskon' => 20000,
+                'minimum_pesanan' => 200000,
+                'status' => 1,
+            ],
+        ]);
+    }
+
+    private function seedShippingMethods(): void
+    {
+        $expeditions = [
+            ['nama_ekspedisi' => 'JNE', 'kode_ekspedisi' => 'jne', 'logo' => '/images/expeditions/jne.png'],
+            ['nama_ekspedisi' => 'J&T', 'kode_ekspedisi' => 'jnt', 'logo' => '/images/expeditions/jnt.png'],
+            ['nama_ekspedisi' => 'TIKI', 'kode_ekspedisi' => 'tiki', 'logo' => '/images/expeditions/tiki.png'],
+            ['nama_ekspedisi' => 'POS', 'kode_ekspedisi' => 'pos', 'logo' => '/images/expeditions/pos.png'],
+            ['nama_ekspedisi' => 'LION', 'kode_ekspedisi' => 'lion', 'logo' => '/images/expeditions/lion.png'],
+        ];
+
+        $expeditionIds = [];
+        foreach ($expeditions as $expedition) {
+            $this->db->table('ekspedisi')->insert($expedition);
+            $expeditionIds[$expedition['kode_ekspedisi']] = $this->db->insertID();
+        }
+
+        $this->db->table('metode_pengiriman')->insertBatch([
+            ['id_ekspedisi' => $expeditionIds['jne'], 'nama_layanan' => 'REG', 'tarif' => 16000, 'tarif_per_kg' => 9000, 'estimasi' => '2-4 hari'],
+            ['id_ekspedisi' => $expeditionIds['jne'], 'nama_layanan' => 'YES', 'tarif' => 34000, 'tarif_per_kg' => 9000, 'estimasi' => '1-2 hari'],
+            ['id_ekspedisi' => $expeditionIds['jne'], 'nama_layanan' => 'JTR', 'tarif' => 55000, 'tarif_per_kg' => 9000, 'estimasi' => '4-6 hari'],
+            ['id_ekspedisi' => $expeditionIds['jnt'], 'nama_layanan' => 'Reguler', 'tarif' => 16000, 'tarif_per_kg' => 8000, 'estimasi' => '2-4 hari'],
+            ['id_ekspedisi' => $expeditionIds['tiki'], 'nama_layanan' => 'Reguler', 'tarif' => 16000, 'tarif_per_kg' => 8000, 'estimasi' => '2-4 hari'],
+            ['id_ekspedisi' => $expeditionIds['pos'], 'nama_layanan' => 'Kilat', 'tarif' => 15000, 'tarif_per_kg' => 8000, 'estimasi' => '3-5 hari'],
+            ['id_ekspedisi' => $expeditionIds['lion'], 'nama_layanan' => 'Regpack', 'tarif' => 15000, 'tarif_per_kg' => 8000, 'estimasi' => '2-4 hari'],
+        ]);
+    }
+
+    private function seedPaymentMethods(): void
+    {
+        $this->db->table('metode_pembayaran')->insertBatch([
+            [
+                'nama_bank' => 'BCA',
+                'no_rekening' => '1234567890',
+                'nama_pemilik' => 'iPlant Indonesia',
+                'status' => 1,
+            ],
+            [
+                'nama_bank' => 'Mandiri',
+                'no_rekening' => '9876543210',
+                'nama_pemilik' => 'iPlant Indonesia',
+                'status' => 1,
+            ],
+        ]);
+    }
+
+    private function seedBlogs(): void
+    {
+        $this->db->table('blog')->insertBatch([
+            [
+                'slug' => 'tanaman-udara-tillandsia',
+                'judul_blog' => 'Tanaman Udara Tillandsia',
+                'gambar' => '/images/blog/Tanaman Udara Tillandsia.png',
+                'konten_blog' => 'Tillandsia adalah tanaman udara yang menyerap uap air dan nutrisi dari udara melalui bulu halus di sekelilingnya.',
+                'tanggal_publish' => '2023-11-10 14:15:00',
+            ],
+            [
+                'slug' => 'rempah-eropa',
+                'judul_blog' => 'Rempah Eropa Yang Bisa Kamu Tanam Di Rumah',
+                'gambar' => '/images/blog/Rempah Eropa Yang Bisa Kamu Tanam Di Rumah.png',
+                'konten_blog' => 'Mint, thyme, rosemary, oregano, dan sage dapat ditanam di rumah dengan perawatan yang relatif mudah.',
+                'tanggal_publish' => '2023-11-09 10:45:00',
+            ],
+            [
+                'slug' => 'tanaman-hias-keberuntungan',
+                'judul_blog' => 'Tanaman Hias Keberuntungan Zamioculcas',
+                'gambar' => '/images/blog/Tanaman Hias Keberuntungan Zamioculcas.png',
+                'konten_blog' => 'Zamioculcas atau pohon dolar populer sebagai tanaman hias indoor karena tampilannya elegan dan perawatannya mudah.',
+                'tanggal_publish' => '2023-11-09 15:30:00',
+            ],
+        ]);
     }
 }

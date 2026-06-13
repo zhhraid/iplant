@@ -10,36 +10,36 @@ class CreateReviews extends Migration
     {
         $this->forge->addField([
             'id' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'unsigned'       => true,
+                'type' => 'INT',
+                'constraint' => 11,
+                'unsigned' => true,
                 'auto_increment' => true,
             ],
             'order_id' => [
-                'type'       => 'INT',
+                'type' => 'INT',
                 'constraint' => 11,
-                'unsigned'   => true,
+                'unsigned' => true,
             ],
             'product_id' => [
-                'type'       => 'INT',
+                'type' => 'INT',
                 'constraint' => 11,
-                'unsigned'   => true,
+                'unsigned' => true,
             ],
             'user_name' => [
-                'type'       => 'VARCHAR',
+                'type' => 'VARCHAR',
                 'constraint' => '120',
             ],
             'rating' => [
-                'type'       => 'TINYINT',
+                'type' => 'TINYINT',
                 'constraint' => 1,
             ],
             'review_text' => [
                 'type' => 'TEXT',
             ],
             'image_url' => [
-                'type'       => 'VARCHAR',
+                'type' => 'VARCHAR',
                 'constraint' => '255',
-                'null'       => true,
+                'null' => true,
             ],
             'created_at' => [
                 'type' => 'DATETIME',

@@ -10,31 +10,31 @@ class OrderItems extends Migration
     {
         $this->forge->addField([
             'id' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'unsigned'       => true,
+                'type' => 'INT',
+                'constraint' => 11,
+                'unsigned' => true,
                 'auto_increment' => true,
             ],
             'order_id' => [
-                'type'       => 'INT',
+                'type' => 'INT',
                 'constraint' => 11,
-                'unsigned'       => true,
+                'unsigned' => true,
             ],
             'product_id' => [
-                'type'       => 'INT',
+                'type' => 'INT',
                 'constraint' => 11,
-                'unsigned'       => true,
+                'unsigned' => true,
             ],
             'product_name' => [
-                'type'       => 'VARCHAR',
+                'type' => 'VARCHAR',
                 'constraint' => '100',
             ],
             'quantity' => [
-                'type'       => 'INT',
+                'type' => 'INT',
                 'constraint' => 11,
             ],
             'price' => [
-                'type'       => 'INT',
+                'type' => 'INT',
                 'constraint' => 11,
             ],
         ]);

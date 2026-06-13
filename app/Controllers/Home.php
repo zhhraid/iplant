@@ -20,7 +20,7 @@ class Home extends BaseController
     {
         $productModel = new ProductModel();
         // Retrieve products belonging to our 5 active subcategories
-        $products = $productModel->whereIn('subcategory', ['Bambu Hoki', 'Anggrek', 'Mawar', 'Mangga', 'Media Tanam'])->findAll();
+        $products = $productModel->findLegacyBySubcategories(['Bambu Hoki', 'Anggrek', 'Mawar', 'Mangga', 'Media Tanam']);
         return view('home', ['products' => $products]);
     }
 
@@ -87,8 +87,6 @@ class Home extends BaseController
             'newsletter' => $this->request->getPost('subscribe') ? 1 : 0,
             'role' => 'customer',
             'is_active' => 1,
-            'created_at' => $now,
-            'updated_at' => $now,
         ]);
 
         $this->session->set('user', [
@@ -116,15 +114,15 @@ class Home extends BaseController
         $productModel = new ProductModel();
 
         $orders = $orderModel
-            ->where('customer_email', $user['email'])
-            ->orderBy('created_at', 'DESC')
+            ->forCustomerEmail($user['email'])
+            ->orderBy('tanggal_pesanan', 'DESC')
             ->findAll();
 
         foreach ($orders as &$order) {
             $items = $orderItemModel->where('order_id', $order['id'])->findAll();
             if (!empty($items)) {
                 $productIds = array_column($items, 'product_id');
-                $products = $productModel->whereIn('id', $productIds)->findAll();
+                $products = $productModel->findLegacyByIds($productIds);
                 $productsById = array_column($products, null, 'id');
                 foreach ($items as &$item) {
                     $prod = $productsById[$item['product_id']] ?? null;
@@ -182,7 +180,6 @@ class Home extends BaseController
 
         $userModel->update($user['id'], [
             'password_hash' => password_hash($password, PASSWORD_DEFAULT),
-            'updated_at' => Time::now(app_timezone())->toDateTimeString(),
         ]);
 
         return redirect()->to('/account')->with('success', 'Password berhasil diubah');
@@ -218,7 +215,7 @@ class Home extends BaseController
         $activeSlug = isset($subNameMap[$subcategory]) ? $subcategory : 'bambu-hoki';
 
         $productModel = new ProductModel();
-        $products = $productModel->where('subcategory', $displayName)->findAll();
+        $products = $productModel->findLegacyBySubcategory($displayName);
 
         return view('category', [
             'active_sub'      => $activeSlug,
@@ -312,10 +309,10 @@ class Home extends BaseController
     {
         $productModel = new ProductModel();
         // Fallback to ID 1 if parameter not provided or valid
-        $product = $productModel->find($id) ?? $productModel->first();
+        $product = $productModel->findLegacy($id) ?? $productModel->firstLegacy();
         
         // Let's pass the other products as 'related'
-        $related = $productModel->where('id !=', $product['id'])->findAll(6);
+        $related = $productModel->findRelatedLegacy((int) $product['id'], 6);
         
         return view('product_detail', ['product' => $product, 'related' => $related]);
     }
@@ -326,7 +323,7 @@ class Home extends BaseController
         $qty = (int) $this->request->getPost('quantity');
         
         $productModel = new ProductModel();
-        $product = $productModel->find($id);
+        $product = $productModel->findLegacy($id);
         
         if ($product && $qty > 0) {
             $cart = $this->session->get('cart') ?? [];
@@ -353,7 +350,7 @@ class Home extends BaseController
         $qty = (int) $this->request->getPost('quantity');
 
         $productModel = new ProductModel();
-        $product = $productModel->find($id);
+        $product = $productModel->findLegacy($id);
 
         if (!$product || $qty <= 0) {
             return $this->response->setJSON(['status' => 'error']);
@@ -539,7 +536,7 @@ class Home extends BaseController
             'unique_code' => $uniqueCode,
             'total_amount' => $totalAmount,
             'status' => 'pending',
-            'created_at' => Time::now(app_timezone())->toDateTimeString()
+            'tanggal_pesanan' => Time::now(app_timezone())->toDateTimeString()
         ];
         
         $orderId = $orderModel->insert($orderData);
@@ -583,7 +580,7 @@ class Home extends BaseController
         
         $items = $orderItemModel->where('order_id', $orderId)->findAll();
         $productIds = array_column($items, 'product_id');
-        $products = empty($productIds) ? [] : $productModel->whereIn('id', $productIds)->findAll();
+        $products = empty($productIds) ? [] : $productModel->findLegacyByIds($productIds);
         $productsById = array_column($products, null, 'id');
 
         foreach ($items as &$item) {
@@ -636,14 +633,14 @@ class Home extends BaseController
             ->groupEnd();
 
         if (!empty($user['email'])) {
-            $builder->where('customer_email', $user['email']);
+            $builder->forCustomerEmail($user['email']);
         }
 
         $order = $builder->orderBy('id', 'DESC')->first();
 
         if (!$order && !empty($user['email'])) {
             $order = $orderModel
-                ->where('customer_email', $user['email'])
+                ->forCustomerEmail($user['email'])
                 ->orderBy('id', 'DESC')
                 ->first();
         }
@@ -851,7 +848,7 @@ class Home extends BaseController
             return [];
         }
 
-        $createdAt = Time::parse($order['created_at'], app_timezone());
+        $createdAt = Time::parse($order['tanggal_pesanan'], app_timezone());
         $courierRaw = $order['shipping_courier'] ?? 'JNE';
         $courier = strtoupper(explode(' - ', $courierRaw)[0] ?? 'JNE');
         $customerName = $order['customer_name'] ?? 'penerima';
@@ -1243,7 +1240,7 @@ class Home extends BaseController
         
         $items = $orderItemModel->where('order_id', $orderId)->findAll();
         $productIds = array_column($items, 'product_id');
-        $products = empty($productIds) ? [] : $productModel->whereIn('id', $productIds)->findAll();
+        $products = empty($productIds) ? [] : $productModel->findLegacyByIds($productIds);
         $productsById = array_column($products, null, 'id');
 
         foreach ($items as &$item) {
